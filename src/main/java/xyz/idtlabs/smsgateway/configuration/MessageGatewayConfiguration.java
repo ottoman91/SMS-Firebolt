@@ -35,8 +35,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableAutoConfiguration
 @EnableJpaRepositories(basePackages = {
-        "org.fineract.messagegateway.sms.repository",
-        "org.fineract.messagegateway.tenants.repository"
+        "xyz.idtlabs.smsgateway.sms.repository",
+        "xyz.idtlabs.smsgateway.tenants.repository"
 		
 })
 @EntityScan(basePackageClasses = {
@@ -47,7 +47,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         Tenant.class
 })
 @ComponentScan(basePackages = {
-        "org.fineract.messagegateway.*"
+        "xyz.idtlabs.smsgateway.*"
 })
 public class MessageGatewayConfiguration {
 
