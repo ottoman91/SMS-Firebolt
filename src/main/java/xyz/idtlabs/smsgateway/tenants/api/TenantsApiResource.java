@@ -65,12 +65,12 @@ public class TenantsApiResource {
 
         //-------------------Retrieve a Single Client --------------------------------------------------------
     
-    @RequestMapping(value = "/{name}",method = RequestMethod.GET)
-    public ResponseEntity<Tenant> getClient(@PathVariable("name") String name) {
-        System.out.println("Fetching Client with Name " + name);
-        Tenant tenant = tenantService.findTenantByTenantName(name);
+    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
+    public ResponseEntity<Tenant> getClient(@PathVariable("id") long id) {
+        System.out.println("Fetching Client with Id " + id);
+        Tenant tenant = tenantService.findTenantById(id);
         if (tenant == null) {
-            System.out.println("Tenant with name " + name + " not found");
+            System.out.println("Tenant with id " + id + " not found");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<Tenant>(tenant, HttpStatus.OK);
@@ -93,30 +93,30 @@ public class TenantsApiResource {
 
         //------------------- Delete a Client --------------------------------------------------------
     
-    @RequestMapping(value = "/{name}",method = RequestMethod.DELETE)
-     public ResponseEntity<Tenant> deleteClient(@PathVariable("name") String name) {
-        System.out.println("Fetching & Deleting Client with name " + name);
+    @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
+     public ResponseEntity<Tenant> deleteClient(@PathVariable("id") long id) {
+        System.out.println("Fetching & Deleting Client with id " + id);
 
-        Tenant tenant = tenantService.findTenantByTenantName(name);
+        Tenant tenant = tenantService.findTenantById(id);
         if (tenant == null) {
-            System.out.println("Unable to delete. Client " + name + " not found");
+            System.out.println("Unable to delete. Client " + id + " not found");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
         }
 
-        tenantService.deleteTenantByTenantName(name);
+        tenantService.deleteTenantById(id);
         return new ResponseEntity<Tenant>(HttpStatus.OK);
     }
 
 //------------------- Update a Client's Details --------------------------------------------------------
     
-    @RequestMapping(value = "/change/{name}",method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<Tenant> updateClientName(@PathVariable("name") String name, @Validated @RequestBody final Tenant tenant) {
-        System.out.println("Updating Client " + name);
+    @RequestMapping(value = "/change/{id}",method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<Tenant> updateClientName(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
+        System.out.println("Updating Client " + id);
         
-        Tenant currentTenant = tenantService.findTenantByTenantName(name);
+        Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with name " + name + " not found");
+            System.out.println("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
         String newName = tenant.getName(); 

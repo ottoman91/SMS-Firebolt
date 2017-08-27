@@ -60,10 +60,10 @@ public class TenantsService {
 		return tenant ;
 	}
 	
-	public Tenant findTenantByTenantId(final String tenantId) {
-		Tenant tenant = this.tenantRepository.findByTenantId(tenantId) ;
+	public Tenant findTenantById(final long id) {
+		Tenant tenant = this.tenantRepository.findById(id) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(tenantId, "") ;
+			throw new TenantNotFoundException(id, "") ;
 		}
 		return tenant ;
 	}  
@@ -87,8 +87,8 @@ public class TenantsService {
 	// 	return tenants;
 	// } 
 
-	public void deleteTenantByTenantId(final String tenantId) {
-		Tenant tenant = this.tenantRepository.findByTenantId(tenantId) ; 
+	public void deleteTenantById(final long id) {
+		Tenant tenant = this.tenantRepository.findById(id) ; 
 		this.tenantRepository.delete(tenant);
 
 	}  
