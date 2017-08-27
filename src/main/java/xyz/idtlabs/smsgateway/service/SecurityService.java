@@ -49,8 +49,8 @@ public class SecurityService {
         super();
     }
     
-    public Tenant authenticate(final String tenantId, final String apiKey) {
-        Tenant tenant = this.tenantService.findTenantByTenantIdAndTenantAppKey(tenantId, apiKey) ;
+    public Tenant authenticate(final String name, final String apiKey) {
+        Tenant tenant = this.tenantService.findTenantByNameAndTenantAppKey(name, apiKey) ;
         return tenant ;
     }
 

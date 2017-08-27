@@ -52,10 +52,10 @@ public class TenantsService {
 		return tenant;
 	}
 	
-	public Tenant findTenantByTenantIdAndTenantAppKey(final String tenantId, final String apiKey) {
-		Tenant tenant = this.tenantRepository.findByTenantIdAndApiKey(tenantId, apiKey) ;
+	public Tenant findTenantByNameAndTenantAppKey(final String name, final String apiKey) {
+		Tenant tenant = this.tenantRepository.findByNameAndApiKey(name, apiKey) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(tenantId, apiKey) ;
+			throw new TenantNotFoundException(name, apiKey) ;
 		}
 		return tenant ;
 	}

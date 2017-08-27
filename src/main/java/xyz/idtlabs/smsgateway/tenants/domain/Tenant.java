@@ -29,8 +29,8 @@ import xyz.idtlabs.smsgateway.sms.domain.AbstractPersistableCustom;
 @Table(name="m_tenants")
 public class Tenant extends AbstractPersistableCustom<Long> {
 
-	@Column(name = "tenant_id", nullable = false)
-	private String tenantId;
+	//@Column(name = "tenant_id", nullable = false)
+	//private String tenantId;
 	
 	@Column(name = "api_key", nullable = false)
 	private String apiKey ;
@@ -47,29 +47,29 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	
 	//this constructor is only here at the moment for maintaining the legacy code base. It would be depreciated in the final
 	//API deployment
-	public Tenant(final String tenantId, final String apiKey) {
-		this.tenantId = tenantId ;
-		this.apiKey = apiKey ;
-		this.name = null;
-		this.displayName = null;
-	} 
+	// public Tenant(final String tenantId, final String apiKey) {
+	// 	this.tenantId = tenantId ;
+	// 	this.apiKey = apiKey ;
+	// 	this.name = null;
+	// 	this.displayName = null;
+	// } 
 
     //the new constructor that would be used in our API
-	public Tenant(final String tenantId, final String api_key,
+	public Tenant(final String api_key,
 	              final String name, final String displayName){
-		this.tenantId = tenantId ;
+		//this.tenantId = tenantId ;
 		this.apiKey = apiKey ;
 		this.name = name;
 		this.displayName = displayName;
 	}
 		
-	public String getTenantId() {
-		return tenantId;
-	}
+	// public String getTenantId() {
+	// 	return tenantId;
+	// }
 
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
+	// public void setTenantId(String tenantId) {
+	// 	this.tenantId = tenantId;
+	// }
 
 	public String getApiKey() {
 		return apiKey;
