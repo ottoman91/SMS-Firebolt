@@ -20,10 +20,16 @@ package xyz.idtlabs.smsgateway.tenants.service;
 
 import xyz.idtlabs.smsgateway.service.SecurityService;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
-import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException;
+import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException; 
+import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; 
+import java.util.List; 
+import org.springframework.data.domain.Page; 
+import org.springframework.data.domain.PageRequest;
+
+
 
 @Service
 public class TenantsService {
@@ -39,16 +45,17 @@ public class TenantsService {
 		this.securityService = securityService ;
 	}
 	
-	public String createTenant(final Tenant tenant) {
-		tenant.setTenantAppKey(this.securityService.generateApiKey(tenant.getTenantId()));
+	public Tenant createTenant(final Tenant tenant) {
+		tenant.setApiKey(this.securityService.generateApiKey(tenant.getOrganization()));
 		this.tenantRepository.save(tenant) ;
-		return tenant.getTenantAppKey() ;
+		//return tenant.getTenantAppKey() ; 
+		return tenant;
 	}
 	
-	public Tenant findTenantByTenantIdAndTenantAppKey(final String tenantId, final String tenantAppKey) {
-		Tenant tenant = this.tenantRepository.findByTenantIdAndTenantAppKey(tenantId, tenantAppKey) ;
+	public Tenant findTenantByTenantIdAndTenantAppKey(final String tenantId, final String apiKey) {
+		Tenant tenant = this.tenantRepository.findByTenantIdAndApiKey(tenantId, apiKey) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(tenantId, tenantAppKey) ;
+			throw new TenantNotFoundException(tenantId, apiKey) ;
 		}
 		return tenant ;
 	}
@@ -59,5 +66,50 @@ public class TenantsService {
 			throw new TenantNotFoundException(tenantId, "") ;
 		}
 		return tenant ;
+	}  
+
+	public Tenant findTenantByTenantName(final String organization) {
+		Tenant tenant = this.tenantRepository.findByOrganization(organization) ;
+		if(tenant == null) {
+			throw new TenantNotFoundException(organization, "") ;
+		}
+		return tenant ;
+	}  
+
+	public Page<Tenant> findAllTenantsPaginated(int page, int size) {
+        return tenantRepository.findAll(new PageRequest(page, size));
+    }
+	// public List<Tenant> findAllTenants(){
+	// 	List<Tenant> tenants = this.tenantRepository.findAll();
+	// 	if(tenants.isEmpty()){
+	// 		throw new TenantsNotFoundException();
+	// 	}
+	// 	return tenants;
+	// } 
+
+	public void deleteTenantByTenantId(final String tenantId) {
+		Tenant tenant = this.tenantRepository.findByTenantId(tenantId) ; 
+		this.tenantRepository.delete(tenant);
+
+	}  
+
+	public void deleteTenantByTenantName(final String organization) {
+		Tenant tenant = this.tenantRepository.findByOrganization(organization) ; 
+		this.tenantRepository.delete(tenant);
+
+	} 
+	public Tenant updateTenant(final Tenant tenant) {
+		this.tenantRepository.save(tenant);
+		return tenant ;
+	}  
+
+	public boolean doesTenantAlreadyExist(final String organization){
+		Tenant tenant = this.tenantRepository.findByOrganization(organization);
+		if(tenant == null){
+			return false;
+		}
+		else{
+			return true;
+		}
 	}
 }

@@ -20,7 +20,8 @@ package xyz.idtlabs.smsgateway.tenants.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Table; 
+import javax.validation.constraints.NotNull;
 
 import xyz.idtlabs.smsgateway.sms.domain.AbstractPersistableCustom;
 
@@ -31,18 +32,35 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	@Column(name = "tenant_id", nullable = false)
 	private String tenantId;
 	
-	@Column(name = "tenant_app_key", nullable = false)
-	private String tenantAppKey ;
+	@Column(name = "api_key", nullable = false)
+	private String apiKey ;
 	
-	@Column(name = "description", nullable = true)
-	private String description ;
+	@Column(name="organization", nullable = true) 
+	@NotNull
+	private String organization; 
+
+	@Column(name="display_name", nullable=true)
+	@NotNull
+	private String displayName;
 	
 	protected Tenant() { }
 	
-	public Tenant(final String tenantId, final String tenantAppKey, final String description) {
+	//this constructor is only here at the moment for maintaining the legacy code base. It would be depreciated in the final
+	//API deployment
+	public Tenant(final String tenantId, final String apiKey) {
 		this.tenantId = tenantId ;
-		this.tenantAppKey = tenantAppKey ;
-		this.description = description ;
+		this.apiKey = apiKey ;
+		this.organization = null;
+		this.displayName = null;
+	} 
+
+    //the new constructor that would be used in our API
+	public Tenant(final String tenantId, final String api_key,
+	              final String organization, final String displayName){
+		this.tenantId = tenantId ;
+		this.apiKey = apiKey ;
+		this.organization = organization;
+		this.displayName = displayName;
 	}
 		
 	public String getTenantId() {
@@ -53,19 +71,31 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 		this.tenantId = tenantId;
 	}
 
-	public String getTenantAppKey() {
-		return tenantAppKey;
+	public String getApiKey() {
+		return apiKey;
 	}
 
-	public void setTenantAppKey(String tenantAppKey) {
-		this.tenantAppKey = tenantAppKey;
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
-	public String getDescription() {
-		return description;
+
+
+	public String getOrganization() {
+		return organization;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}  
+
+
+	public String getDisplayName() {
+		return displayName;
 	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	} 
+
 }

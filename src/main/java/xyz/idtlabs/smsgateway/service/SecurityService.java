@@ -49,9 +49,9 @@ public class SecurityService {
         super();
     }
     
-    public Tenant authenticate(final String tenantId, final String tenantAppKey) {
-    	Tenant tenant = this.tenantService.findTenantByTenantIdAndTenantAppKey(tenantId, tenantAppKey) ;
-    	return tenant ;
+    public Tenant authenticate(final String tenantId, final String api_key) {
+        Tenant tenant = this.tenantService.findTenantByTenantIdAndTenantAppKey(tenantId, api_key) ;
+        return tenant ;
     }
 
     /*public void verifyApiKey(final String apiKey, final String tenantId) {
@@ -61,6 +61,7 @@ public class SecurityService {
         }
     }*/
 
+    //legacy API Key Generation code that is currently here to ensure that the code base doesnt' break
     public String generateApiKey(final SMSBridge smsBridge) {
         try {
             final String source = smsBridge.generateApiKey() ;
@@ -71,19 +72,20 @@ public class SecurityService {
         }
     }
     
-    public String generateApiKey(final String tenantId) {
-    	Tenant tenant = this.tenantRepository.findByTenantId(tenantId) ;
-    	if(tenant != null) {
-    		SecurityException.tenantAlreadyExisits(tenantId) ;
-    	}
-    	
+    // Our new API key generation code for the Client API
+    public String generateApiKey(final String organization) {
+        Tenant tenant = this.tenantRepository.findByOrganization(organization) ;
+        if(tenant != null) {
+            SecurityException.tenantAlreadyExists(organization) ;
+        }
+        
         final String randomKey = UUID.randomUUID().toString();
         try {
-			final String restApiKey = URLEncoder.encode(randomKey, "UTF-8");
-			return restApiKey;
-		} catch (final UnsupportedEncodingException e) {
-			logger.error("API Key generation error..., reason,", e);
-			throw new UnexpectedException();
-		}
-	}
+            final String restApiKey = URLEncoder.encode(randomKey, "UTF-8");
+            return restApiKey;
+        } catch (final UnsupportedEncodingException e) {
+            logger.error("API Key generation error..., reason,", e);
+            throw new UnexpectedException();
+        }
+    }
 }

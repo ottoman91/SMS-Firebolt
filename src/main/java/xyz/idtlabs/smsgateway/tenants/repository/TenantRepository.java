@@ -26,9 +26,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TenantRepository
-		extends JpaRepository<Tenant, Long>, JpaSpecificationExecutor<Tenant> {
-	
-	Tenant findByTenantId(@Param("tenantId") final String tenantId) ;
-	
-	Tenant findByTenantIdAndTenantAppKey(@Param("tenantId") final String tenantId, @Param("tenantAppKey") final String tenantAppKey) ;
+        extends JpaRepository<Tenant, Long>, JpaSpecificationExecutor<Tenant> {
+    
+    Tenant findByTenantId(@Param("tenantId") final String tenantId) ; 
+
+    Tenant findByOrganization(@Param("organization") final String organization);
+    
+    Tenant findByTenantIdAndApiKey(@Param("tenantId") final String tenantId, @Param("apiKey") final String apiKey) ;
+
 }
