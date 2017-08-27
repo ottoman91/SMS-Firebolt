@@ -52,8 +52,8 @@ public class TenantsApiResource {
 
     @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> createClient( @Validated @RequestBody final Tenant tenant) {
-        String organizationName = tenant.getOrganization();
-        boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(organizationName);
+        String name = tenant.getName();
+        boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(name);
         if(tenantAlreadyExists == true){
             throw new TenantAlreadyExists();
         } 
@@ -65,12 +65,12 @@ public class TenantsApiResource {
 
         //-------------------Retrieve a Single Client --------------------------------------------------------
     
-    @RequestMapping(value = "/{organization}",method = RequestMethod.GET)
-    public ResponseEntity<Tenant> getClient(@PathVariable("organization") String organization) {
-        System.out.println("Fetching Client with Name " + organization);
-        Tenant tenant = tenantService.findTenantByTenantName(organization);
+    @RequestMapping(value = "/{name}",method = RequestMethod.GET)
+    public ResponseEntity<Tenant> getClient(@PathVariable("name") String name) {
+        System.out.println("Fetching Client with Name " + name);
+        Tenant tenant = tenantService.findTenantByTenantName(name);
         if (tenant == null) {
-            System.out.println("Tenant with name " + organization + " not found");
+            System.out.println("Tenant with name " + name + " not found");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<Tenant>(tenant, HttpStatus.OK);
@@ -93,38 +93,44 @@ public class TenantsApiResource {
 
         //------------------- Delete a Client --------------------------------------------------------
     
-    @RequestMapping(value = "/{organization}",method = RequestMethod.DELETE)
-     public ResponseEntity<Tenant> deleteClient(@PathVariable("organization") String organization) {
-        System.out.println("Fetching & Deleting Client with name " + organization);
+    @RequestMapping(value = "/{name}",method = RequestMethod.DELETE)
+     public ResponseEntity<Tenant> deleteClient(@PathVariable("name") String name) {
+        System.out.println("Fetching & Deleting Client with name " + name);
 
-        Tenant tenant = tenantService.findTenantByTenantName(organization);
+        Tenant tenant = tenantService.findTenantByTenantName(name);
         if (tenant == null) {
-            System.out.println("Unable to delete. Client " + organization + " not found");
+            System.out.println("Unable to delete. Client " + name + " not found");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
         }
 
-        tenantService.deleteTenantByTenantName(organization);
+        tenantService.deleteTenantByTenantName(name);
         return new ResponseEntity<Tenant>(HttpStatus.OK);
     }
 
 //------------------- Update a Client's Details --------------------------------------------------------
     
-    @RequestMapping(value = "/change/{organization}",method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<Tenant> updateClientName(@PathVariable("organization") String organization, @Validated @RequestBody final Tenant tenant) {
-        System.out.println("Updating Client " + organization);
+    @RequestMapping(value = "/change/{name}",method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<Tenant> updateClientName(@PathVariable("name") String name, @Validated @RequestBody final Tenant tenant) {
+        System.out.println("Updating Client " + name);
         
-        Tenant currentTenant = tenantService.findTenantByTenantName(organization);
+        Tenant currentTenant = tenantService.findTenantByTenantName(name);
         
         if (currentTenant==null) {
-            System.out.println("Client with name " + organization + " not found");
+            System.out.println("Client with name " + name + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
-        String newOrganizationName = tenant.getOrganization(); 
-        String newOrganizationDisplayName = tenant.getDisplayName();
-        currentTenant.setOrganization(newOrganizationName); 
-        currentTenant.setDisplayName(newOrganizationDisplayName);
-        
-        Tenant updatedTenant = tenantService.updateTenant(currentTenant);
-        return new ResponseEntity<>(updatedTenant, HttpStatus.OK);
+        String newName = tenant.getName(); 
+        String newDisplayName = tenant.getDisplayName(); 
+        boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(newName); 
+        if(tenantAlreadyExists == true){
+            throw new TenantAlreadyExists();
+        } 
+        else{
+            currentTenant.setName(newName); 
+            currentTenant.setDisplayName(newDisplayName); 
+            Tenant updatedTenant = tenantService.updateTenant(currentTenant);
+            return new ResponseEntity<>(updatedTenant, HttpStatus.OK);
+
+        }     
     } 
 }

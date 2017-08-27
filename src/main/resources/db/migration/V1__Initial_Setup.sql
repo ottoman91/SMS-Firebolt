@@ -21,7 +21,7 @@ CREATE TABLE m_tenants (
   id                      BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   tenant_id               VARCHAR(32)               NULL DEFAULT NULL,
   api_key                 VARCHAR(100)                    NOT NULL,
-  organization      VARCHAR(500)                    NULL DEFAULT NULL, 
+  name                    VARCHAR(500)                    NULL DEFAULT NULL, 
   display_name      VARCHAR(500)                    NULL DEFAULT NULL,
   blocked           TINYINT(1)                      NULL DEFAULT 0 
 );
@@ -63,7 +63,7 @@ CREATE TABLE m_sms_bridge_configuration (
   CONSTRAINT `m_provider_configuration_1` FOREIGN KEY (`sms_bridge_id`) REFERENCES `m_sms_bridge` (`id`)
 );
 
-INSERT INTO `m_tenants` (`tenant_id`, `api_key`,`organization`,`display_name`)
+INSERT INTO `m_tenants` (`tenant_id`, `api_key`,`name`,`display_name`)
 VALUES ('default', "123456543234abdkdkdkd", "defaultClient","DefaultClient") ;
 
 INSERT INTO `m_sms_bridge` (`tenant_id`, `tenant_phone_no`, `provider_key`, `country_code`, `provider_name`, `description`)

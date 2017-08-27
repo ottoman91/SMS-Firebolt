@@ -46,7 +46,7 @@ public class TenantsService {
 	}
 	
 	public Tenant createTenant(final Tenant tenant) {
-		tenant.setApiKey(this.securityService.generateApiKey(tenant.getOrganization()));
+		tenant.setApiKey(this.securityService.generateApiKey(tenant.getName()));
 		this.tenantRepository.save(tenant) ;
 		//return tenant.getTenantAppKey() ; 
 		return tenant;
@@ -68,10 +68,10 @@ public class TenantsService {
 		return tenant ;
 	}  
 
-	public Tenant findTenantByTenantName(final String organization) {
-		Tenant tenant = this.tenantRepository.findByOrganization(organization) ;
+	public Tenant findTenantByTenantName(final String name) {
+		Tenant tenant = this.tenantRepository.findByName(name) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(organization, "") ;
+			throw new TenantNotFoundException(name, "") ;
 		}
 		return tenant ;
 	}  
@@ -93,8 +93,8 @@ public class TenantsService {
 
 	}  
 
-	public void deleteTenantByTenantName(final String organization) {
-		Tenant tenant = this.tenantRepository.findByOrganization(organization) ; 
+	public void deleteTenantByTenantName(final String name) {
+		Tenant tenant = this.tenantRepository.findByName(name) ; 
 		this.tenantRepository.delete(tenant);
 
 	} 
@@ -103,8 +103,8 @@ public class TenantsService {
 		return tenant ;
 	}  
 
-	public boolean doesTenantAlreadyExist(final String organization){
-		Tenant tenant = this.tenantRepository.findByOrganization(organization);
+	public boolean doesTenantAlreadyExist(final String name){
+		Tenant tenant = this.tenantRepository.findByName(name);
 		if(tenant == null){
 			return false;
 		}

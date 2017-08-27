@@ -30,7 +30,7 @@ public interface TenantRepository
     
     Tenant findByTenantId(@Param("tenantId") final String tenantId) ; 
 
-    Tenant findByOrganization(@Param("organization") final String organization);
+    Tenant findByName(@Param("name") final String name);
     
     Tenant findByTenantIdAndApiKey(@Param("tenantId") final String tenantId, @Param("apiKey") final String apiKey) ;
 

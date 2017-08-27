@@ -49,8 +49,8 @@ public class SecurityService {
         super();
     }
     
-    public Tenant authenticate(final String tenantId, final String api_key) {
-        Tenant tenant = this.tenantService.findTenantByTenantIdAndTenantAppKey(tenantId, api_key) ;
+    public Tenant authenticate(final String tenantId, final String apiKey) {
+        Tenant tenant = this.tenantService.findTenantByTenantIdAndTenantAppKey(tenantId, apiKey) ;
         return tenant ;
     }
 
@@ -73,10 +73,10 @@ public class SecurityService {
     }
     
     // Our new API key generation code for the Client API
-    public String generateApiKey(final String organization) {
-        Tenant tenant = this.tenantRepository.findByOrganization(organization) ;
+    public String generateApiKey(final String name) {
+        Tenant tenant = this.tenantRepository.findByName(name) ;
         if(tenant != null) {
-            SecurityException.tenantAlreadyExists(organization) ;
+            SecurityException.tenantAlreadyExists(name) ;
         }
         
         final String randomKey = UUID.randomUUID().toString();

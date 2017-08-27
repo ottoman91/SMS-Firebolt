@@ -35,9 +35,9 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	@Column(name = "api_key", nullable = false)
 	private String apiKey ;
 	
-	@Column(name="organization", nullable = true) 
+	@Column(name="name", nullable = true) 
 	@NotNull
-	private String organization; 
+	private String name; 
 
 	@Column(name="display_name", nullable=true)
 	@NotNull
@@ -50,16 +50,16 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	public Tenant(final String tenantId, final String apiKey) {
 		this.tenantId = tenantId ;
 		this.apiKey = apiKey ;
-		this.organization = null;
+		this.name = null;
 		this.displayName = null;
 	} 
 
     //the new constructor that would be used in our API
 	public Tenant(final String tenantId, final String api_key,
-	              final String organization, final String displayName){
+	              final String name, final String displayName){
 		this.tenantId = tenantId ;
 		this.apiKey = apiKey ;
-		this.organization = organization;
+		this.name = name;
 		this.displayName = displayName;
 	}
 		
@@ -81,12 +81,12 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 
 
 
-	public String getOrganization() {
-		return organization;
+	public String getName() {
+		return name;
 	}
 
-	public void setOrganization(String organization) {
-		this.organization = organization;
+	public void setName(String name) {
+		this.name = name;
 	}  
 
 
