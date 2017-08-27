@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */ 
-//testing this out
+
 package xyz.idtlabs.smsgateway.tenants.api;
 
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
