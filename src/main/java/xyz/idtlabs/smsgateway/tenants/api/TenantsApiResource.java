@@ -21,7 +21,7 @@ package xyz.idtlabs.smsgateway.tenants.api;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException; 
-import xyz.idtlabs.smsgateway.tenants.exception.TenantAlreadyExists;
+import xyz.idtlabs.smsgateway.tenants.exception.TenantExists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +55,7 @@ public class TenantsApiResource {
         String name = tenant.getName();
         boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(name);
         if(tenantAlreadyExists == true){
-            throw new TenantAlreadyExists();
+            throw new TenantExists();
         } 
         else{
             Tenant createdTenant = this.tenantService.createTenant(tenant);
@@ -109,7 +109,7 @@ public class TenantsApiResource {
 
 //------------------- Update a Client's Details --------------------------------------------------------
     
-    @RequestMapping(value = "/change/{id}",method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = "/change/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> updateClientName(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
         System.out.println("Updating Client " + id);
         
@@ -123,7 +123,7 @@ public class TenantsApiResource {
         String newDisplayName = tenant.getDisplayName(); 
         boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(newName); 
         if(tenantAlreadyExists == true){
-            throw new TenantAlreadyExists();
+            throw new TenantExists();
         } 
         else{
             currentTenant.setName(newName); 

@@ -29,7 +29,9 @@ import xyz.idtlabs.smsgateway.sms.domain.AbstractPersistableCustom;
 @Table(name="m_tenants")
 public class Tenant extends AbstractPersistableCustom<Long> {
 
-	
+	@Column(name="id", nullable = false, insertable = false, updatable = false)
+	private Long id;
+
 	@Column(name = "api_key", nullable = false)
 	private String apiKey ;
 	
@@ -46,15 +48,16 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	
 
     //the new constructor that would be used in our API
-	public Tenant(final String api_key,
+	public Tenant(final String apiKey,
 	              final String name, final String displayName){
-		//this.tenantId = tenantId ;
 		this.apiKey = apiKey ;
 		this.name = name;
 		this.displayName = displayName;
 	}
 		
-	
+	public Long getId(){
+		return id;
+	}
 
 	public String getApiKey() {
 		return apiKey;

@@ -21,11 +21,11 @@ package xyz.idtlabs.smsgateway.tenants.exception;
 public class TenantNotFoundException extends RuntimeException{
 
 	public TenantNotFoundException(final long id, final String apiKey) {
-		super("Tenant with identifier "+id + "not found") ;
+		super("Client with id "+id + " not found") ;
 	} 
  
     public TenantNotFoundException(final String name, final String apiKey) {
-        super("Tenant with identifier "+name + "not found") ;
+        super("Client with name "+name + " not found") ;
     } 
 
 }

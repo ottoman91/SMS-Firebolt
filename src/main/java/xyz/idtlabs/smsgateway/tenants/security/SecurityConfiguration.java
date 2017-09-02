@@ -20,27 +20,49 @@ package xyz.idtlabs.smsgateway.tenants.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration; 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
- 
+import org.springframework.security.config.http.SessionCreationPolicy; 
+import org.springframework.security.provisioning.InMemoryUserDetailsManager; 
+import org.springframework.core.io.Resource; 
+import org.springframework.security.core.userdetails.UserDetailsService; 
+import java.util.Properties; 
+import java.io.IOException;
+import org.springframework.security.core.userdetails.User;
+
+
+
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
-    private static String REALM="MY_TEST_REALM";
+    private static String REALM="CLIENT_SERVICE_REALM";
      
+
     @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("idtlabs").password("abc123").roles("ADMIN");
-        auth.inMemoryAuthentication().withUser("idtlabsuser").password("abc123").roles("USER");
+    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception{
+        auth.userDetailsService(inMemoryUserDetailsManager());
+    } 
+
+
+    @Bean
+    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+        InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
+        inMemoryUserDetailsManager.createUser(User.withUsername("idtlabs").password("abc123").authorities("ROLE_ADMIN", "ROLE_USER").build());
+        return inMemoryUserDetailsManager;
+
     }
-     
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
   

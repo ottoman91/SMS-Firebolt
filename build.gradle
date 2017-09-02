@@ -32,7 +32,7 @@ repositories {
 
 license {
     header rootProject.file('./LICENSE.md')
-    excludes(["**/*.html", "**/*.mustache", "**/package-info.java", "**/keystore.jks"])
+    excludes(["**/*.html", "**/*.mustache", "**/package-info.java", "**/keystore.jks","**.properties"])
     strictCheck true
 }
 

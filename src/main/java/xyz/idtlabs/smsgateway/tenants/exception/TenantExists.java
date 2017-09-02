@@ -16,15 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.exception;
+package xyz.idtlabs.smsgateway.tenants.exception;
 
-public class SecurityException extends RuntimeException {
+public class TenantExists extends RuntimeException{
 
-	private SecurityException(final String msg) {
-		super(msg);
-	}
-
-	public static SecurityException tenantExists(final String tenant) {
-		return new SecurityException("Client Already exists with "+tenant+" identifier");
-	}
+    public TenantExists() {
+        super("The client already exists") ;
+    }
 }

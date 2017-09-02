@@ -45,10 +45,11 @@ public class TenantsService {
 		this.securityService = securityService ;
 	}
 	
-	public Tenant createTenant(final Tenant tenant) {
-		tenant.setApiKey(this.securityService.generateApiKey(tenant.getName()));
-		this.tenantRepository.save(tenant) ;
-		//return tenant.getTenantAppKey() ; 
+
+
+	public Tenant createTenant(final Tenant tenant){
+		tenant.setApiKey(this.securityService.generateApiKey(tenant.getId()));
+		this.tenantRepository.save(tenant);
 		return tenant;
 	}
 	

@@ -73,12 +73,10 @@ public class SecurityService {
         }
     }
     
-    // Our new API key generation code for the Client API
-    public String generateApiKey(final String name) {
-        Tenant tenant = this.tenantRepository.findByName(name) ;
-        if(tenant != null) {
-            SecurityException.tenantAlreadyExists(name) ;
-        }
+   
+
+    //Api generation code that uses client ID to generate the API Key
+    public String generateApiKey(final Long id) {
         
         final String randomKey = UUID.randomUUID().toString();
         try {

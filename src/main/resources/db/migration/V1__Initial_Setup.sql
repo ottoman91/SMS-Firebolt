@@ -19,11 +19,13 @@
 
 CREATE TABLE m_tenants (
   id                      BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  api_key                 VARCHAR(100)                    NOT NULL,
-  name                    VARCHAR(500)                    NULL DEFAULT NULL, 
-  display_name      VARCHAR(500)                    NULL DEFAULT NULL,
-  blocked           TINYINT(1)                      NULL DEFAULT 0 
-);
+  api_key                 VARCHAR(100)                    UNIQUE KEY NOT NULL,
+  name                    VARCHAR(500)                   UNIQUE KEY NOT NULL, 
+  display_name      VARCHAR(500)                    UNIQUE KEY NOT NULL,
+  blocked           TINYINT(1)                      NULL DEFAULT 0
+); 
+
+CREATE INDEX by_api_key on m_tenants (`api_key`);
 
 CREATE TABLE m_sms_bridge (
   id                      BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
