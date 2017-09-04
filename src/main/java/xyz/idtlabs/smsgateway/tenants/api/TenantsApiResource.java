@@ -152,5 +152,23 @@ public class TenantsApiResource {
         return new ResponseEntity<>(updatedTenant,HttpStatus.OK);
         
              
+    }  
+
+    //------------------- Block A Client from Using the API Key --------------------------------------------------------
+    
+    @RequestMapping(value = "/block/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<String> blockClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
+        System.out.println("Blocking Client " + id);
+        
+        Tenant currentTenant = tenantService.findTenantById(id);
+        
+        if (currentTenant==null) {
+            System.out.println("Client with id " + id + " not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }  
+        String clientBlockedStatus = tenantService.blockClientApi(id);
+        return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
+        
+             
     } 
 }

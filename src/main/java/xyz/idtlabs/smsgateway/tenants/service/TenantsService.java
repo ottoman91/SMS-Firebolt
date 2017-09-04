@@ -116,5 +116,18 @@ public class TenantsService {
 	public String generateApiKey(final long id){
         String newApiKey = this.securityService.generateApiKey(id);
         return newApiKey;
+    } 
+
+    public String blockClientApi(final long id){
+    	Tenant tenant = this.tenantRepository.findById(id);
+    	boolean blockedStatus = tenant.getBlocked();
+    	if (blockedStatus == true){
+    		return "Client is already blocked";
+    	}
+    	else{
+    		tenant.setBlocked();
+    		this.tenantRepository.save(tenant);
+    		return "Client has been blocked now";
+    	}
     }
 }

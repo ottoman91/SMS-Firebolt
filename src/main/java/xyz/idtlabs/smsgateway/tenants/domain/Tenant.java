@@ -41,7 +41,10 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 
 	@Column(name="display_name", nullable=true)
 	@NotNull
-	private String displayName;
+	private String displayName; 
+
+	@Column(name="blocked",nullable = true)
+	private boolean blocked;
 	
 	protected Tenant() { }
 	
@@ -53,6 +56,7 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 		this.apiKey = apiKey ;
 		this.name = name;
 		this.displayName = displayName;
+		this.blocked = false;
 	}
 		
 	public Long getId(){
@@ -84,6 +88,14 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}  
+
+	public boolean getBlocked(){
+		return blocked;
 	} 
+	public boolean setBlocked(){
+		this.blocked = true; 
+		return blocked;
+	}
 
 }
