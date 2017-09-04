@@ -132,5 +132,25 @@ public class TenantsApiResource {
             return new ResponseEntity<>(updatedTenant, HttpStatus.OK);
 
         }     
+    }  
+
+    //------------------- Update a Client's Api Key --------------------------------------------------------
+    
+    @RequestMapping(value = "/change/apikey/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<Tenant> updateClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
+        System.out.println("Updating Client " + id);
+        
+        Tenant currentTenant = tenantService.findTenantById(id);
+        
+        if (currentTenant==null) {
+            System.out.println("Client with id " + id + " not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }  
+        String newApiKey = tenantService.generateApiKey(id);
+        currentTenant.setApiKey(newApiKey);
+        Tenant updatedTenant = tenantService.updateTenant(currentTenant);
+        return new ResponseEntity<>(updatedTenant,HttpStatus.OK);
+        
+             
     } 
 }

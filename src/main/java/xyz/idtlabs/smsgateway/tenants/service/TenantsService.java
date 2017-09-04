@@ -112,5 +112,9 @@ public class TenantsService {
 		else{
 			return true;
 		}
-	}
+	} 
+	public String generateApiKey(final long id){
+        String newApiKey = this.securityService.generateApiKey(id);
+        return newApiKey;
+    }
 }
