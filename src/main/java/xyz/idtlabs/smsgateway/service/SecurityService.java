@@ -50,8 +50,13 @@ public class SecurityService {
     }
     
     //the authentication function was changed to ensure that when the tenantId field was removed, the legacy code base did not break
-    public Tenant authenticate(final String name, final String apiKey) {
-        Tenant tenant = this.tenantService.findTenantByNameAndTenantAppKey(name, apiKey) ;
+    // public Tenant authenticate(final String name, final String apiKey) {
+    //     Tenant tenant = this.tenantService.findTenantByNameAndTenantAppKey(name, apiKey) ;
+    //     return tenant ;
+    // } 
+
+    public Tenant authenticate(final String apiKey) {
+        Tenant tenant = this.tenantService.findTenantByTenantAppKey(apiKey) ;
         return tenant ;
     }
 

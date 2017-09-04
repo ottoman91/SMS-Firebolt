@@ -32,6 +32,9 @@ public interface TenantRepository
 
     Tenant findByName(@Param("name") final String name);
     
-    Tenant findByNameAndApiKey(@Param("name") final String tenantId, @Param("apiKey") final String apiKey) ;
+    Tenant findByNameAndApiKey(@Param("name") final String tenantId, @Param("apiKey") final String apiKey) ; 
+
+    Tenant findByApiKey(@Param("apiKey") final String apiKey) ; 
+
 
 }

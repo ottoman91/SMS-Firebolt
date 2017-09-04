@@ -59,6 +59,14 @@ public class TenantsService {
 			throw new TenantNotFoundException(name, apiKey) ;
 		}
 		return tenant ;
+	} 
+
+	public Tenant findTenantByTenantAppKey(final String apiKey) {
+		Tenant tenant = this.tenantRepository.findByApiKey(apiKey) ;
+		if(tenant == null) {
+			throw new TenantNotFoundException(apiKey, "") ;
+		}
+		return tenant ;
 	}
 	
 	public Tenant findTenantById(final long id) {
