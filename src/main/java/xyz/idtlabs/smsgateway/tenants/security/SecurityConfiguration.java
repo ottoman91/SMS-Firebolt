@@ -45,7 +45,7 @@ import org.springframework.security.core.userdetails.User;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
-    private static String REALM="CLIENT_SERVICE_REALM";
+    private static String REALM="SMS_FIREBOLT_REALM";
      
 
     @Autowired

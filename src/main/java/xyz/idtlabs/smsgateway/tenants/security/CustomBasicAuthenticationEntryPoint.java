@@ -44,7 +44,7 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
      
     @Override
     public void afterPropertiesSet() throws Exception {
-        setRealmName("CLIENT_SERVICE_REALM");
+        setRealmName("SMS_FIREBOLT_REALM");
         super.afterPropertiesSet();
     }
 }

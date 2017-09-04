@@ -109,7 +109,7 @@ public class TenantsApiResource {
 
 //------------------- Update a Client's Details --------------------------------------------------------
     
-    @RequestMapping(value = "/change/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = "/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> updateClientName(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
         System.out.println("Updating Client " + id);
         
@@ -121,22 +121,15 @@ public class TenantsApiResource {
         }  
         String newName = tenant.getName(); 
         String newDisplayName = tenant.getDisplayName(); 
-        boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(newName); 
-        if(tenantAlreadyExists == true){
-            throw new TenantExists();
-        } 
-        else{
-            currentTenant.setName(newName); 
-            currentTenant.setDisplayName(newDisplayName); 
-            Tenant updatedTenant = tenantService.updateTenant(currentTenant);
-            return new ResponseEntity<>(updatedTenant, HttpStatus.OK);
-
-        }     
+        currentTenant.setName(newName); 
+        currentTenant.setDisplayName(newDisplayName); 
+        Tenant updatedTenant = tenantService.updateTenant(currentTenant);
+        return new ResponseEntity<>(updatedTenant, HttpStatus.OK);     
     }  
 
     //------------------- Update a Client's Api Key --------------------------------------------------------
     
-    @RequestMapping(value = "/change/apikey/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = "/apikey/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> updateClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
         System.out.println("Updating Client " + id);
         
