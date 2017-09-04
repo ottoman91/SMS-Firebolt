@@ -81,7 +81,7 @@ public class SecurityService {
    
 
     //Api generation code that uses client ID to generate the API Key
-    public String generateApiKey(final Long id) {
+    public String generateApiKey() {
         
         final String randomKey = UUID.randomUUID().toString();
         try {

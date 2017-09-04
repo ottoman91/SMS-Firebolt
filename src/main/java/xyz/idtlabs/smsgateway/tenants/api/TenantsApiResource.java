@@ -146,7 +146,7 @@ public class TenantsApiResource {
             System.out.println("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
-        String newApiKey = tenantService.generateApiKey(id);
+        String newApiKey = tenantService.generateApiKey();
         currentTenant.setApiKey(newApiKey);
         Tenant updatedTenant = tenantService.updateTenant(currentTenant);
         return new ResponseEntity<>(updatedTenant,HttpStatus.OK);

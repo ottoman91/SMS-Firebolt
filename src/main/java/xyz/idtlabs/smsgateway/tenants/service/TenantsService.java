@@ -48,7 +48,7 @@ public class TenantsService {
 
 
 	public Tenant createTenant(final Tenant tenant){
-		tenant.setApiKey(this.securityService.generateApiKey(tenant.getId()));
+		tenant.setApiKey(this.securityService.generateApiKey());
 		this.tenantRepository.save(tenant);
 		return tenant;
 	}
@@ -121,8 +121,8 @@ public class TenantsService {
 			return true;
 		}
 	} 
-	public String generateApiKey(final long id){
-        String newApiKey = this.securityService.generateApiKey(id);
+	public String generateApiKey(){
+        String newApiKey = this.securityService.generateApiKey();
         return newApiKey;
     } 
 
