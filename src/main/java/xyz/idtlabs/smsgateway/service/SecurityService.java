@@ -56,8 +56,7 @@ public class SecurityService {
     // } 
 
     public Tenant authenticate(final String apiKey) {
-        Tenant tenant = this.tenantService.findTenantByTenantAppKey(apiKey) ;
-        return tenant ;
+        return this.tenantService.findTenantByApiKey(apiKey);
     }
 
     /*public void verifyApiKey(final String apiKey, final String tenantId) {

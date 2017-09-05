@@ -118,18 +118,22 @@ public class TenantsApiResource {
         if (currentTenant==null) {
             System.out.println("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }  
+        }   
         String newName = tenant.getName(); 
         String newDisplayName = tenant.getDisplayName(); 
+        
         currentTenant.setName(newName); 
         currentTenant.setDisplayName(newDisplayName); 
         Tenant updatedTenant = tenantService.updateTenant(currentTenant);
-        return new ResponseEntity<>(updatedTenant, HttpStatus.OK);     
+        return new ResponseEntity<>(updatedTenant, HttpStatus.OK);   
+        
+
+          
     }  
 
     //------------------- Update a Client's Api Key --------------------------------------------------------
     
-    @RequestMapping(value = "/apikey/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = "/{id}/apikey",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> updateClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
         System.out.println("Updating Client " + id);
         
@@ -149,7 +153,7 @@ public class TenantsApiResource {
 
     //------------------- Block A Client from Using the API Key --------------------------------------------------------
     
-    @RequestMapping(value = "/block/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = "/{id}/block",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<String> blockClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
         System.out.println("Blocking Client " + id);
         
@@ -159,7 +163,7 @@ public class TenantsApiResource {
             System.out.println("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
-        String clientBlockedStatus = tenantService.blockClientApi(id);
+        String clientBlockedStatus = tenantService.blockClient(id);
         return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
         
              

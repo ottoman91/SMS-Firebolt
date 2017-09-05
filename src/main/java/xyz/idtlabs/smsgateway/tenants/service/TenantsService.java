@@ -53,7 +53,7 @@ public class TenantsService {
 		return tenant;
 	}
 	
-	public Tenant findTenantByNameAndTenantAppKey(final String name, final String apiKey) {
+	public Tenant findTenantByNameAndApiKey(final String name, final String apiKey) {
 		Tenant tenant = this.tenantRepository.findByNameAndApiKey(name, apiKey) ;
 		if(tenant == null) {
 			throw new TenantNotFoundException(name, apiKey) ;
@@ -61,7 +61,7 @@ public class TenantsService {
 		return tenant ;
 	} 
 
-	public Tenant findTenantByTenantAppKey(final String apiKey) {
+	public Tenant findTenantByApiKey(final String apiKey) {
 		Tenant tenant = this.tenantRepository.findByApiKey(apiKey) ;
 		if(tenant == null) {
 			throw new TenantNotFoundException(apiKey, "") ;
@@ -77,7 +77,7 @@ public class TenantsService {
 		return tenant ;
 	}  
 
-	public Tenant findTenantByTenantName(final String name) {
+	public Tenant findTenantByName(final String name) {
 		Tenant tenant = this.tenantRepository.findByName(name) ;
 		if(tenant == null) {
 			throw new TenantNotFoundException(name, "") ;
@@ -102,7 +102,7 @@ public class TenantsService {
 
 	}  
 
-	public void deleteTenantByTenantName(final String name) {
+	public void deleteTenantByName(final String name) {
 		Tenant tenant = this.tenantRepository.findByName(name) ; 
 		this.tenantRepository.delete(tenant);
 
@@ -126,7 +126,7 @@ public class TenantsService {
         return newApiKey;
     } 
 
-    public String blockClientApi(final long id){
+    public String blockClient(final long id){
     	Tenant tenant = this.tenantRepository.findById(id);
     	boolean blockedStatus = tenant.getBlocked();
     	if (blockedStatus == true){
