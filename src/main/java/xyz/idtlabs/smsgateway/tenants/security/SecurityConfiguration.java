@@ -51,15 +51,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(inMemoryUserDetailsManager());
-    } 
+    }  
+
+    @Value("classpath:users.properties")
+    private Resource users; 
 
 
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
-        inMemoryUserDetailsManager.createUser(User.withUsername("idtlabs").password("abc123").authorities("ROLE_ADMIN", "ROLE_USER").build());
-        return inMemoryUserDetailsManager;
+        //InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
+        Properties properties = new Properties();
+        try{
+            properties.load(users.getInputStream());
+            
+        }catch(IOException e){
+            e.printStackTrace();
 
+        }
+        //inMemoryUserDetailsManager.createUser(User.withUsername("idtlabs").password("abc123").authorities("ROLE_ADMIN", "ROLE_USER").build());
+        //return inMemoryUserDetailsManager;
+        return new InMemoryUserDetailsManager(properties);
     }
 
 
