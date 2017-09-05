@@ -129,13 +129,30 @@ public class TenantsService {
     public String blockClient(final long id){
     	Tenant tenant = this.tenantRepository.findById(id);
     	boolean blockedStatus = tenant.getBlocked();
+    	boolean newBlockedStatus = true;
     	if (blockedStatus == true){
     		return "Client is already blocked";
     	}
     	else{
-    		tenant.setBlocked();
+    		tenant.setBlocked(newBlockedStatus);
     		this.tenantRepository.save(tenant);
     		return "Client has been blocked now";
     	}
-    }
+    }  
+
+    public String unblockClient(final long id){
+    	Tenant tenant = this.tenantRepository.findById(id);
+    	boolean blockedStatus = tenant.getBlocked();
+    	boolean newBlockedStatus = false;
+    	if (blockedStatus == false){
+    		return "Client is already unblocked";
+    	}
+    	else{
+    		tenant.setBlocked(newBlockedStatus);
+    		this.tenantRepository.save(tenant);
+    		return "Client has been unblocked now";
+    	}
+    } 
+
+
 }

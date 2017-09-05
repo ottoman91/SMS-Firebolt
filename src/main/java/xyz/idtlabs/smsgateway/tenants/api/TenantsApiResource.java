@@ -120,8 +120,7 @@ public class TenantsApiResource {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }   
         String newName = tenant.getName(); 
-        String newDisplayName = tenant.getDisplayName(); 
-        
+        String newDisplayName = tenant.getDisplayName();         
         currentTenant.setName(newName); 
         currentTenant.setDisplayName(newDisplayName); 
         Tenant updatedTenant = tenantService.updateTenant(currentTenant);
@@ -154,7 +153,7 @@ public class TenantsApiResource {
     //------------------- Block A Client from Using the API Key --------------------------------------------------------
     
     @RequestMapping(value = "/{id}/block",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<String> blockClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
+    public ResponseEntity<String> blockClient(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
         System.out.println("Blocking Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
@@ -164,6 +163,24 @@ public class TenantsApiResource {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
         String clientBlockedStatus = tenantService.blockClient(id);
+        return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
+        
+             
+    }  
+
+     //------------------- UnBlock A Client from Using the API Key --------------------------------------------------------
+    
+    @RequestMapping(value = "/{id}/unblock",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<String> unblockClient(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
+        System.out.println("Unblocking Client " + id);
+        
+        Tenant currentTenant = tenantService.findTenantById(id);
+        
+        if (currentTenant==null) {
+            System.out.println("Client with id " + id + " not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }  
+        String clientBlockedStatus = tenantService.unblockClient(id);
         return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
         
              

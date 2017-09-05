@@ -59,7 +59,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        //InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
         Properties properties = new Properties();
         try{
             properties.load(users.getInputStream());
@@ -68,8 +67,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             e.printStackTrace();
 
         }
-        //inMemoryUserDetailsManager.createUser(User.withUsername("idtlabs").password("abc123").authorities("ROLE_ADMIN", "ROLE_USER").build());
-        //return inMemoryUserDetailsManager;
         return new InMemoryUserDetailsManager(properties);
     }
 

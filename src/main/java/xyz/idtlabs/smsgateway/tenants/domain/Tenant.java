@@ -87,8 +87,8 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	public boolean getBlocked(){
 		return blocked;
 	} 
-	public boolean setBlocked(){
-		this.blocked = true; 
+	public boolean setBlocked(boolean blocked){
+		this.blocked = blocked; 
 		return blocked;
 	}
 
