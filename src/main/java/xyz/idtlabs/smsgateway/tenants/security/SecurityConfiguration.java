@@ -36,7 +36,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.UserDetailsService; 
 import java.util.Properties; 
 import java.io.IOException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.User; 
+import java.util.logging.*;
+
+
 
 
 
@@ -45,7 +48,9 @@ import org.springframework.security.core.userdetails.User;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
-    private static String REALM="SMS_FIREBOLT_REALM";
+    private static String REALM="SMS_FIREBOLT_REALM"; 
+    private static final Logger LOGGER = Logger.getLogger( SecurityConfiguration.class.getName() ); 
+
      
 
     @Autowired
@@ -64,7 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             properties.load(users.getInputStream());
             
         }catch(IOException e){
-            System.out.print("Error in reading data from users.properties file");
+            LOGGER.log(Level.SEVERE,e.toString(),e);
 
         }
         return new InMemoryUserDetailsManager(properties);
