@@ -130,7 +130,7 @@ public class TenantsService {
     	Tenant tenant = this.tenantRepository.findById(id);
     	boolean blockedStatus = tenant.getBlocked();
     	boolean newBlockedStatus = true;
-    	if (blockedStatus == true){
+    	if (blockedStatus){
     		return "Client is already blocked";
     	}
     	else{
@@ -144,7 +144,7 @@ public class TenantsService {
     	Tenant tenant = this.tenantRepository.findById(id);
     	boolean blockedStatus = tenant.getBlocked();
     	boolean newBlockedStatus = false;
-    	if (blockedStatus == false){
+    	if (!blockedStatus){
     		return "Client is already unblocked";
     	}
     	else{

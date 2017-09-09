@@ -54,7 +54,7 @@ public class TenantsApiResource {
     public ResponseEntity<Tenant> createClient( @Validated @RequestBody final Tenant tenant) {
         String name = tenant.getName();
         boolean tenantAlreadyExists = tenantService.doesTenantAlreadyExist(name);
-        if(tenantAlreadyExists == true){
+        if(tenantAlreadyExists){
             throw new TenantExists();
         } 
         else{

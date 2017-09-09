@@ -19,9 +19,9 @@
 
 CREATE TABLE m_tenants (
   id                      BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  api_key                 VARCHAR(100)                    UNIQUE KEY NOT NULL,
-  name                    VARCHAR(500)                   UNIQUE KEY NOT NULL, 
-  display_name      VARCHAR(500)                    UNIQUE KEY NOT NULL,
+  api_key                 VARCHAR(100)                    UNIQUE NOT NULL,
+  name                    VARCHAR(500)                   UNIQUE NOT NULL, 
+  display_name      VARCHAR(500)                    UNIQUE NOT NULL,
   blocked           TINYINT(1)                      NULL DEFAULT 0
 ); 
 

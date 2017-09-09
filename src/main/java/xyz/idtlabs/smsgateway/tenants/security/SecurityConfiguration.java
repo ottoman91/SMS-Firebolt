@@ -64,7 +64,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             properties.load(users.getInputStream());
             
         }catch(IOException e){
-            e.printStackTrace();
+            System.out.print("Error in reading data from users.properties file");
 
         }
         return new InMemoryUserDetailsManager(properties);
