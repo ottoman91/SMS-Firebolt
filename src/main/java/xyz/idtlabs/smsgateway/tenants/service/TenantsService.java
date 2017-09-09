@@ -20,10 +20,16 @@ package xyz.idtlabs.smsgateway.tenants.service;
 
 import xyz.idtlabs.smsgateway.service.SecurityService;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
-import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException;
+import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException; 
+import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; 
+import java.util.List; 
+import org.springframework.data.domain.Page; 
+import org.springframework.data.domain.PageRequest;
+
+
 
 @Service
 public class TenantsService {
@@ -39,25 +45,114 @@ public class TenantsService {
 		this.securityService = securityService ;
 	}
 	
-	public String createTenant(final Tenant tenant) {
-		tenant.setTenantAppKey(this.securityService.generateApiKey(tenant.getTenantId()));
-		this.tenantRepository.save(tenant) ;
-		return tenant.getTenantAppKey() ;
+
+
+	public Tenant createTenant(final Tenant tenant){
+		tenant.setApiKey(this.securityService.generateApiKey());
+		this.tenantRepository.save(tenant);
+		return tenant;
 	}
 	
-	public Tenant findTenantByTenantIdAndTenantAppKey(final String tenantId, final String tenantAppKey) {
-		Tenant tenant = this.tenantRepository.findByTenantIdAndTenantAppKey(tenantId, tenantAppKey) ;
+	public Tenant findTenantByNameAndApiKey(final String name, final String apiKey) {
+		Tenant tenant = this.tenantRepository.findByNameAndApiKey(name, apiKey) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(tenantId, tenantAppKey) ;
+			throw new TenantNotFoundException(name, apiKey) ;
+		}
+		return tenant ;
+	} 
+
+	public Tenant findTenantByApiKey(final String apiKey) {
+		Tenant tenant = this.tenantRepository.findByApiKey(apiKey) ;
+		if(tenant == null) {
+			throw new TenantNotFoundException(apiKey, "") ;
 		}
 		return tenant ;
 	}
 	
-	public Tenant findTenantByTenantId(final String tenantId) {
-		Tenant tenant = this.tenantRepository.findByTenantId(tenantId) ;
+	public Tenant findTenantById(final long id) {
+		Tenant tenant = this.tenantRepository.findById(id) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(tenantId, "") ;
+			throw new TenantNotFoundException(id, "") ;
 		}
 		return tenant ;
-	}
+	}  
+
+	public Tenant findTenantByName(final String name) {
+		Tenant tenant = this.tenantRepository.findByName(name) ;
+		if(tenant == null) {
+			throw new TenantNotFoundException(name, "") ;
+		}
+		return tenant ;
+	}  
+
+	public Page<Tenant> findAllTenantsPaginated(int page, int size) {
+        return tenantRepository.findAll(new PageRequest(page, size));
+    }
+	// public List<Tenant> findAllTenants(){
+	// 	List<Tenant> tenants = this.tenantRepository.findAll();
+	// 	if(tenants.isEmpty()){
+	// 		throw new TenantsNotFoundException();
+	// 	}
+	// 	return tenants;
+	// } 
+
+	public void deleteTenantById(final long id) {
+		Tenant tenant = this.tenantRepository.findById(id) ; 
+		this.tenantRepository.delete(tenant);
+
+	}  
+
+	public void deleteTenantByName(final String name) {
+		Tenant tenant = this.tenantRepository.findByName(name) ; 
+		this.tenantRepository.delete(tenant);
+
+	} 
+	public Tenant updateTenant(final Tenant tenant) {
+		this.tenantRepository.save(tenant);
+		return tenant ;
+	}  
+
+	public boolean doesTenantAlreadyExist(final String name){
+		Tenant tenant = this.tenantRepository.findByName(name);
+		if(tenant == null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	} 
+	public String generateApiKey(){
+        String newApiKey = this.securityService.generateApiKey();
+        return newApiKey;
+    } 
+
+    public String blockClient(final long id){
+    	Tenant tenant = this.tenantRepository.findById(id);
+    	boolean blockedStatus = tenant.getBlocked();
+    	boolean newBlockedStatus = true;
+    	if (blockedStatus){
+    		return "Client is already blocked";
+    	}
+    	else{
+    		tenant.setBlocked(newBlockedStatus);
+    		this.tenantRepository.save(tenant);
+    		return "Client has been blocked now";
+    	}
+    }  
+
+    public String unblockClient(final long id){
+    	Tenant tenant = this.tenantRepository.findById(id);
+    	boolean blockedStatus = tenant.getBlocked();
+    	boolean newBlockedStatus = false;
+    	if (!blockedStatus){
+    		return "Client is already unblocked";
+    	}
+    	else{
+    		tenant.setBlocked(newBlockedStatus);
+    		this.tenantRepository.save(tenant);
+    		return "Client has been unblocked now";
+    	}
+    } 
+
+
 }

@@ -88,7 +88,7 @@ public class SMSMessageService {
 	
 	public void sendShortMessage(final String tenantId, final String tenantAppKey, final Collection<SMSMessage> messages) {
 		logger.debug("Request Received to send messages.....");
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		for(SMSMessage message: messages) {
 			message.setTenant(tenant.getId());
 		}
@@ -97,7 +97,7 @@ public class SMSMessageService {
 	}
 	
 	public Collection<DeliveryStatusData> getDeliveryStatus(final String tenantId, final String tenantAppKey, final Collection<Long> internalIds) {
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		DeliveryStatusDataRowMapper mapper = new DeliveryStatusDataRowMapper() ;
 		String internaIdString = internalIds.toString() ;
 		internaIdString = internaIdString.replace("[", "(") ;

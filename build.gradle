@@ -32,7 +32,7 @@ repositories {
 
 license {
     header rootProject.file('./LICENSE.md')
-    excludes(["**/*.html", "**/*.mustache", "**/package-info.java", "**/keystore.jks"])
+    excludes(["**/*.html", "**/*.mustache", "**/package-info.java", "**/keystore.jks","**.properties"])
     strictCheck true
 }
 
@@ -52,7 +52,9 @@ dependencies {
     compile('com.squareup.retrofit:retrofit:1.6.1')
     compile('com.twilio.sdk:twilio:7.1.0')
     compile('org.drizzle.jdbc:drizzle-jdbc:1.3')
-    compile('com.infobip:infobip-api-java-client:1.1.0')
+    compile('com.infobip:infobip-api-java-client:1.1.0') 
+    compile ('org.springframework.security:spring-security-acl:4.2.3.RELEASE')
+    compile 'org.springframework.security.oauth:spring-security-oauth2:2.2.0.RELEASE'
     testCompile("org.springframework.boot:spring-boot-starter-test")
     
 }

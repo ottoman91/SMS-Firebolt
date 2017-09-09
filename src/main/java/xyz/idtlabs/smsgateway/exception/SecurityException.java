@@ -24,7 +24,7 @@ public class SecurityException extends RuntimeException {
 		super(msg);
 	}
 
-	public static SecurityException tenantAlreadyExisits(final String tenant) {
-		return new SecurityException("Tenant Already existing with "+tenant+" identifier");
+	public static SecurityException tenantExists(final String tenant) {
+		return new SecurityException("Client Already exists with "+tenant+" identifier");
 	}
 }

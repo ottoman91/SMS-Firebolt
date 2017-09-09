@@ -16,25 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.tenants.repository;
+package xyz.idtlabs.smsgateway.tenants.exception;
 
-import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+public class TenantExists extends RuntimeException{
 
-@Repository
-public interface TenantRepository
-        extends JpaRepository<Tenant, Long>, JpaSpecificationExecutor<Tenant> {
-    
-    Tenant findById(@Param("id") final long id) ; 
-
-    Tenant findByName(@Param("name") final String name);
-    
-    Tenant findByNameAndApiKey(@Param("name") final String tenantId, @Param("apiKey") final String apiKey) ; 
-
-    Tenant findByApiKey(@Param("apiKey") final String apiKey) ; 
-
-
+    public TenantExists() {
+        super("The client already exists") ;
+    }
 }

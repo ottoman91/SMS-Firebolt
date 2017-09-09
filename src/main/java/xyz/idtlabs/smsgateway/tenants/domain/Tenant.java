@@ -20,7 +20,8 @@ package xyz.idtlabs.smsgateway.tenants.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Table; 
+import javax.validation.constraints.NotNull;
 
 import xyz.idtlabs.smsgateway.sms.domain.AbstractPersistableCustom;
 
@@ -28,44 +29,67 @@ import xyz.idtlabs.smsgateway.sms.domain.AbstractPersistableCustom;
 @Table(name="m_tenants")
 public class Tenant extends AbstractPersistableCustom<Long> {
 
-	@Column(name = "tenant_id", nullable = false)
-	private String tenantId;
+
+	@Column(name = "api_key", nullable = false)
+	private String apiKey ;
 	
-	@Column(name = "tenant_app_key", nullable = false)
-	private String tenantAppKey ;
-	
-	@Column(name = "description", nullable = true)
-	private String description ;
+	@Column(name="name", nullable = true) 
+	@NotNull
+	private String name; 
+
+	@Column(name="display_name", nullable=true)
+	@NotNull
+	private String displayName; 
+
+	@Column(name="blocked",nullable = true)
+	private boolean blocked;
 	
 	protected Tenant() { }
 	
-	public Tenant(final String tenantId, final String tenantAppKey, final String description) {
-		this.tenantId = tenantId ;
-		this.tenantAppKey = tenantAppKey ;
-		this.description = description ;
+	
+
+    //the new constructor that would be used in our API
+	public Tenant(final String apiKey,
+	              final String name, final String displayName){
+		this.apiKey = apiKey ;
+		this.name = name;
+		this.displayName = displayName;
+		this.blocked = false;
 	}
 		
-	public String getTenantId() {
-		return tenantId;
+	public String getApiKey() {
+		return apiKey;
 	}
 
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
-	public String getTenantAppKey() {
-		return tenantAppKey;
+
+
+	public String getName() {
+		return name;
 	}
 
-	public void setTenantAppKey(String tenantAppKey) {
-		this.tenantAppKey = tenantAppKey;
+	public void setName(String name) {
+		this.name = name;
+	}  
+
+
+	public String getDisplayName() {
+		return displayName;
 	}
 
-	public String getDescription() {
-		return description;
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}  
+
+	public boolean getBlocked(){
+		return blocked;
+	} 
+	public boolean setBlocked(boolean blocked){
+		this.blocked = blocked; 
+		return blocked;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
 }

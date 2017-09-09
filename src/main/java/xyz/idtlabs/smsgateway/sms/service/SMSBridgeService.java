@@ -49,13 +49,13 @@ public class SMSBridgeService {
 	}
 
 	public Collection<SMSBridge> retrieveProviderDetails(final String tenantId, final String tenantAppKey) {
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		return this.smsBridgeRepository.findByTenantId(tenant.getId());
 	}
 
 	@Transactional
 	public Long createSmsBridgeConfig(final String tenantId, final String tenantAppKey, final String json) {
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		SMSBridge smsBridge = this.smsBridgeService.validateCreate(json, tenant) ;
 		final SMSBridge newSMSmsBridge = this.smsBridgeRepository.save(smsBridge);
 		return newSMSmsBridge.getId();
@@ -63,7 +63,7 @@ public class SMSBridgeService {
 
 	@Transactional
 	public void updateSmsBridge(final String tenantId, final String tenantAppKey, final Long bridgeId, final String json) {
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		final SMSBridge bridge = this.smsBridgeRepository.findByIdAndTenantId(bridgeId, tenant.getId()) ;
 		if (bridge == null) {
 			throw new SMSBridgeNotFoundException(bridgeId);
@@ -73,7 +73,7 @@ public class SMSBridgeService {
 	}
 	
 	public Long deleteSmsBridge(final String tenantId, final String tenantAppKey, final Long bridgeId) throws SMSBridgeNotFoundException{
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		final SMSBridge bridge = this.smsBridgeRepository.findByIdAndTenantId(bridgeId, tenant.getId()) ;
 		if (bridge == null) {
 			throw new SMSBridgeNotFoundException(bridgeId);
@@ -85,7 +85,7 @@ public class SMSBridgeService {
 	
 	public SMSBridge retrieveSmsBridge(final String tenantId, final String tenantAppKey, final Long bridgeId)
 			throws SMSBridgeNotFoundException {
-		Tenant tenant = this.securityService.authenticate(tenantId, tenantAppKey) ;
+		Tenant tenant = this.securityService.authenticate(tenantAppKey) ;
 		final SMSBridge bridge = this.smsBridgeRepository.findByIdAndTenantId(bridgeId, tenant.getId());
 		if (bridge == null) {
 			throw new SMSBridgeNotFoundException(bridgeId);
