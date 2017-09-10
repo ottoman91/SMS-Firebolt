@@ -27,6 +27,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
+
 
 @Repository
 public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, Long>, JpaSpecificationExecutor<SMSMessage> {
@@ -46,7 +48,7 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 	 * @param externalId -- {@link SmsMessageStatusType} externalId
 	 * @return {@link SmsMessageStatusType}
 	 **/
-    SMSMessage findByExternalId(String externalId);
+    SMSMessage findByExternalId(String externalId); 
 	
 	/** 
 	 * find {@link SmsMessageStatusType} objects with id in "idList" and mifosTenantIdentifier equal to "mifosTenantIdentifier"
@@ -55,5 +57,9 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 	 * @param mifosTenantIdentifier -- Mifos X tenant identifier e.g. demo
 	 * @return List of {@link SmsMessageStatusType} objects
 	 **/
-	List<SMSMessage> findByIdInAndTenantId(List<Long> idList, String mifosTenantIdentifier);
+	List<SMSMessage> findByIdInAndTenantId(List<Long> idList, String mifosTenantIdentifier); 
+
+    SMSMessage findByTenantId(@Param(tenantId) final Long tenantId );
+
+
 }

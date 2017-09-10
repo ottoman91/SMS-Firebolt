@@ -184,5 +184,24 @@ public class TenantsApiResource {
         return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
         
              
+    }  
+
+
+     //------------------- Retrieve Single Message Sent by a Client --------------------------------------------------------
+    
+    @RequestMapping(value = "/{id}/messages/{message_id}",method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<String> showMessage(@PathVariable("id") long id, @PathVariable("message_id") long messageId) {
+        System.out.println("Listing Message with id" + messageId" Sent by Client " + id);
+        
+        Tenant currentTenant = tenantService.findTenantById(id);
+        
+        if (currentTenant==null) {
+            System.out.println("Client with id " + id + " not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }  
+        String clientBlockedStatus = tenantService.unblockClient(id);
+        return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
+        
+             
     } 
 }
