@@ -22,6 +22,8 @@ import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException; 
 import xyz.idtlabs.smsgateway.tenants.exception.TenantExists;
+import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
+import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;  
 import org.springframework.web.bind.annotation.RequestParam;  
 import org.springframework.validation.annotation.Validated;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Page;  
+import java.util.List; 
+import java.util.Date;
+
 
 
 import java.util.List;
@@ -42,11 +47,13 @@ import java.util.List;
 @RequestMapping("/clients")
 public class TenantsApiResource {
 
-    private final TenantsService tenantService ;
+    private final TenantsService tenantService ; 
+    private final SMSMessageService smsMessageService;
     
     @Autowired
-    public TenantsApiResource(final TenantsService tenantService) {
+    public TenantsApiResource(final TenantsService tenantService, final SMSMessageService smsMessageService) {
         this.tenantService = tenantService ;
+        this.smsMessageService = smsMessageService;
     }
             //-------------------Create a new Client--------------------------------------------------------
 
@@ -187,11 +194,11 @@ public class TenantsApiResource {
     }  
 
 
-     //------------------- Retrieve Single Message Sent by a Client --------------------------------------------------------
+     //------------------- Retrieve All Messages Sent by a Client --------------------------------------------------------
     
-    @RequestMapping(value = "/{id}/messages/{message_id}",method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<String> showMessage(@PathVariable("id") long id, @PathVariable("message_id") long messageId) {
-        System.out.println("Listing Message with id" + messageId" Sent by Client " + id);
+    @RequestMapping(value = "/{id}/messages",method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<List<SMSMessage>> listMessages(@PathVariable("id") long id) {
+        System.out.println("Listing Messages sent by Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
@@ -199,9 +206,30 @@ public class TenantsApiResource {
             System.out.println("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
-        String clientBlockedStatus = tenantService.unblockClient(id);
-        return new ResponseEntity<>(clientBlockedStatus,HttpStatus.OK);
+        List<SMSMessage> messages = smsMessageService.findMessagesByTenantId(id);
+        return new ResponseEntity<List<SMSMessage>>(messages,HttpStatus.OK);
         
              
-    } 
+    }  
+
+    //------------------- Retrieve A Single Message Sent by a Client --------------------------------------------------------
+    
+    @RequestMapping(value = "/{id}/messages/{messageId}",method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<SMSMessage> listMessage(@PathVariable("id") long id, @PathVariable("messageId") long messageId) {
+        System.out.println("Listing individual Message with id" + messageId + " sent by Client " + id);
+        
+        Tenant currentTenant = tenantService.findTenantById(id);
+        
+        if (currentTenant==null) {
+            System.out.println("Client with id " + id + " not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }  
+        SMSMessage message = smsMessageService.findMessageByTenantIdAndId(id,messageId);
+        return new ResponseEntity<SMSMessage>(message,HttpStatus.OK);
+        
+             
+    }   
+
+
+    
 }

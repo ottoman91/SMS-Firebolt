@@ -36,7 +36,9 @@ import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.providers.SMSProviderFactory;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
-import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType;
+import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType; 
+import xyz.idtlabs.smsgateway.sms.exception.SmsMessagesNotFoundException;
+import xyz.idtlabs.smsgateway.sms.exception.SmsMessageNotFoundException;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; 
+import java.util.List;
+
 
 @Service
 public class SMSMessageService {
@@ -182,5 +186,21 @@ public class SMSMessageService {
 		}
 	} 
 
-	
+	public List<SMSMessage> findMessagesByTenantId(final Long tenantId){
+		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByTenantId(tenantId);
+		if(smsMessages == null){
+			throw new SmsMessagesNotFoundException(tenantId);
+		}
+		return smsMessages;
+	} 
+
+	public SMSMessage findMessageByTenantIdAndId(final Long tenantId, final long messageId){
+		SMSMessage smsMessage = this.smsOutboundMessageRepository.findByTenantIdAndId(tenantId,messageId);
+		if(smsMessage == null){
+			throw new SmsMessageNotFoundException(tenantId,messageId);
+		} 
+		return smsMessage;
+	}  
+
+
 }

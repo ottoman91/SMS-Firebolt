@@ -66,8 +66,23 @@ CREATE TABLE m_sms_bridge_configuration (
 );
 
 INSERT INTO `m_tenants` (`api_key`,`name`,`display_name`)
-VALUES ("123456543234abdkdkdkd", "defaultClient","DefaultClient") ;
+VALUES ("123456543234abdkdkdkd", "defaultClient","DefaultClient") ; 
+
+INSERT INTO `m_tenants` (`api_key`,`name`,`display_name`)
+VALUES ("1232323456765", "defaultClient2","DefaultClient2") ;
+
 
 INSERT INTO `m_sms_bridge` (`tenant_id`, `tenant_phone_no`, `provider_key`, `country_code`, `provider_name`, `description`)
-VALUES (1, '+1234567890', 'Dummy', '+91', 'Dummy SMS Provider - Testing', 'Dummy, just for testing'); 
+VALUES (1, '+1234567890', 'Dummy', '+91', 'Dummy SMS Provider - Testing', 'Dummy, just for testing');  
+
+INSERT INTO `m_outbound_messages` (`tenant_id`,`internal_id`,`sms_bridge_id`,`mobile_number`,`submitted_on_date`,`delivered_on_date`,`delivery_status`,`message`)
+VALUES (1,1,1,'123456',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'test message');  
+
+INSERT INTO `m_outbound_messages` (`tenant_id`,`internal_id`,`sms_bridge_id`,`mobile_number`,`submitted_on_date`,`delivered_on_date`,`delivery_status`,`message`)
+VALUES (1,2,1,'123456',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'test message two');  
+
+INSERT INTO `m_outbound_messages` (`tenant_id`,`internal_id`,`sms_bridge_id`,`mobile_number`,`submitted_on_date`,`delivered_on_date`,`delivery_status`,`message`)
+VALUES (2,2,1,'123456',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'test message three'); 
+
+
 
