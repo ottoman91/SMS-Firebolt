@@ -203,14 +203,13 @@ public class SMSMessageService {
 		} 
 		return smsMessage;
 	}   
-	public List<SMSMessage> showTotalMessagesSentBetweenDatesByTenant(final Date dateFrom, final Date dateTo, final Long tenantId){
+	public int showTotalMessagesSentBetweenDatesByTenant(final Date dateFrom, final Date dateTo, final Long tenantId){
 		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(dateFrom,dateTo,tenantId);
-		//int numberofMessages = smsMessages.size();
-		//return "The number of messages sent by client with id " + tenantId + "between " + dateFrom + " and " + dateTo + " are " +numberofMessages;
-		if(smsMessages == null){
+		int numberofMessagesSent = smsMessages.size();
+		if(numberofMessagesSent == 0){
 			throw new SmsMessagesNotFoundException(tenantId);
 		}
-		return smsMessages;
+		return numberofMessagesSent;
 	}
 
 

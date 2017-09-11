@@ -22,7 +22,8 @@ import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException; 
 import xyz.idtlabs.smsgateway.tenants.exception.TenantExists;
-import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
+import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
+import xyz.idtlabs.smsgateway.sms.domain.SentMessageStats; 
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,14 +33,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController; 
 import org.springframework.web.bind.annotation.PathVariable;  
-import org.springframework.web.bind.annotation.RequestParam;  
+import org.springframework.web.bind.annotation.RequestParam;   
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.validation.annotation.Validated; 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Page;  
 import java.util.List; 
 import java.util.Date;
 import java.text.DateFormat;
-import java.util.List;
+import java.util.List; 
+import org.json.JSONObject;
 
 
 @RestController
@@ -236,7 +239,7 @@ public class TenantsApiResource {
   //------------------- Retrieve Stats of Messages Sent By Client Within Specific Dates --------------------------------------------------------
     
     @RequestMapping(value = "/{id}/messages", params = {"dateFrom", "dateTo"},method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<List<SMSMessage>> shrowMessageStatsWithinDateRange(@PathVariable("id") long id,
+    public ResponseEntity<?> shrowMessageStatsWithinDateRange(@PathVariable("id") long id,
         @RequestParam("dateFrom") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateFrom, @RequestParam("dateTo") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateTo) {
         System.out.println("Listing message stats between  " + dateFrom + " and " + dateTo + " sent by Client " + id);
         
@@ -245,9 +248,15 @@ public class TenantsApiResource {
         if (currentTenant==null) {
             System.out.println("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }  
-        List<SMSMessage> messages = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(dateFrom,dateTo,id);
-        return new ResponseEntity<List<SMSMessage>>(messages,HttpStatus.OK);
+        }    
+        int numberOfMessagesSent = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(dateFrom,dateTo,id);
+        SentMessageStats sentMessageStats = new SentMessageStats();
+        sentMessageStats.setNumberOfMessagesSent(numberOfMessagesSent);
+        sentMessageStats.setStartingDate(dateFrom.toString());
+        sentMessageStats.setEndingDate(dateTo.toString());
+        
+
+        return new ResponseEntity<SentMessageStats>(sentMessageStats,HttpStatus.OK);
         
              
     }  
