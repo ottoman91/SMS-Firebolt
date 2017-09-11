@@ -55,7 +55,6 @@ dependencies {
     compile('com.infobip:infobip-api-java-client:1.1.0') 
     compile ('org.springframework.security:spring-security-acl:4.2.3.RELEASE')
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.2.0.RELEASE'
-    compile('org.json:json:20170516')
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 
     

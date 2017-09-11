@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Date;
 import java.text.DateFormat;
 import java.util.List; 
-import org.json.JSONObject;
 
 
 @RestController
@@ -51,8 +50,6 @@ public class TenantsApiResource {
 
     private final TenantsService tenantService ; 
     private final SMSMessageService smsMessageService; 
-    //DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
-    //Date today = dateFormat.parse(dateFormat.format(new Date()));
     Date today = new Date();
 
     
