@@ -33,13 +33,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController; 
 import org.springframework.web.bind.annotation.PathVariable;  
 import org.springframework.web.bind.annotation.RequestParam;  
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.annotation.Validated; 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Page;  
 import java.util.List; 
 import java.util.Date;
-
-
-
+import java.text.DateFormat;
 import java.util.List;
 
 
@@ -48,7 +47,11 @@ import java.util.List;
 public class TenantsApiResource {
 
     private final TenantsService tenantService ; 
-    private final SMSMessageService smsMessageService;
+    private final SMSMessageService smsMessageService; 
+    //DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
+    //Date today = dateFormat.parse(dateFormat.format(new Date()));
+    Date today = new Date();
+
     
     @Autowired
     public TenantsApiResource(final TenantsService tenantService, final SMSMessageService smsMessageService) {
@@ -230,6 +233,23 @@ public class TenantsApiResource {
              
     }   
 
-
+  //------------------- Retrieve Stats of Messages Sent By Client Within Specific Dates --------------------------------------------------------
+    
+    @RequestMapping(value = "/{id}/messages", params = {"dateFrom", "dateTo"},method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<List<SMSMessage>> shrowMessageStatsWithinDateRange(@PathVariable("id") long id,
+        @RequestParam("dateFrom") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateFrom, @RequestParam("dateTo") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateTo) {
+        System.out.println("Listing message stats between  " + dateFrom + " and " + dateTo + " sent by Client " + id);
+        
+        Tenant currentTenant = tenantService.findTenantById(id);
+        
+        if (currentTenant==null) {
+            System.out.println("Client with id " + id + " not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }  
+        List<SMSMessage> messages = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(dateFrom,dateTo,id);
+        return new ResponseEntity<List<SMSMessage>>(messages,HttpStatus.OK);
+        
+             
+    }  
     
 }

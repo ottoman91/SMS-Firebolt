@@ -27,7 +27,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.query.Param; 
+import java.util.Date;
+import org.springframework.data.jpa.repository.Query;
 
 
 @Repository
@@ -61,7 +63,8 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 
     List<SMSMessage> findByTenantId(Long tenantId);  
 
-   
+   @Query(value="SELECT * FROM m_outbound_messages s WHERE s.submitted_on_date >= :dateFrom AND s.submitted_on_date <= :dateTo AND s.id = :id ",nativeQuery=true)
+   List<SMSMessage> findByDatesAndId(@Param("dateFrom") Date dateFrom,@Param("dateTo") Date dateTo, @Param("id") Long id);
 
 
 

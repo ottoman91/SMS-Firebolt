@@ -48,7 +48,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service; 
-import java.util.List;
+import java.util.List; 
+import java.util.Date;
+
 
 
 @Service
@@ -200,7 +202,16 @@ public class SMSMessageService {
 			throw new SmsMessageNotFoundException(tenantId,messageId);
 		} 
 		return smsMessage;
-	}  
+	}   
+	public List<SMSMessage> showTotalMessagesSentBetweenDatesByTenant(final Date dateFrom, final Date dateTo, final Long tenantId){
+		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(dateFrom,dateTo,tenantId);
+		//int numberofMessages = smsMessages.size();
+		//return "The number of messages sent by client with id " + tenantId + "between " + dateFrom + " and " + dateTo + " are " +numberofMessages;
+		if(smsMessages == null){
+			throw new SmsMessagesNotFoundException(tenantId);
+		}
+		return smsMessages;
+	}
 
 
 }
