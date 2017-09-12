@@ -233,7 +233,7 @@ public class TenantsApiResource {
 
   //------------------- Retrieve Stats of Messages Sent By Client Within Specific Dates --------------------------------------------------------
     
-    @RequestMapping(value = "/{id}/messages", params = {"dateFrom", "dateTo"},method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = "/{id}/messages/stats", params = {"dateFrom", "dateTo"},method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<?> shrowMessageStatsWithinDateRange(@PathVariable("id") long id,
         @RequestParam("dateFrom") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateFrom, @RequestParam("dateTo") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateTo) {
         System.out.println("Listing message stats between  " + dateFrom + " and " + dateTo + " sent by Client " + id);
