@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.validation.annotation.Validated; 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Page;  
+import org.springframework.data.domain.Pageable;
 import java.util.List; 
 import java.util.Date;
 import java.text.DateFormat;
@@ -49,8 +50,7 @@ import java.util.List;
 public class TenantsApiResource {
 
     private final TenantsService tenantService ; 
-    private final SMSMessageService smsMessageService; 
-    Date today = new Date();
+    private final SMSMessageService smsMessageService;
 
     
     @Autowired
@@ -199,19 +199,17 @@ public class TenantsApiResource {
 
      //------------------- Retrieve All Messages Sent by a Client --------------------------------------------------------
     
-    @RequestMapping(value = "/{id}/messages",method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<List<SMSMessage>> listMessages(@PathVariable("id") long id) {
+    @RequestMapping(value = "/{id}/messages",params = {"page", "size"},method = RequestMethod.GET,consumes = {"application/json"})
+    public Page<SMSMessage> listMessages(@PathVariable("id") long id,
+            @RequestParam("page") int page, @RequestParam("size") int size) {
         System.out.println("Listing Messages sent by Client " + id);
         
-        Tenant currentTenant = tenantService.findTenantById(id);
-        
-        if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }  
-        List<SMSMessage> messages = smsMessageService.findMessagesByTenantId(id);
-        return new ResponseEntity<List<SMSMessage>>(messages,HttpStatus.OK);
-        
+        Page<SMSMessage> messages = smsMessageService.findMessagesByTenantId(id, page, size);
+        if (page > messages.getTotalPages()) {
+            throw new TenantsNotFoundException();
+        }
+  
+        return messages;        
              
     }  
 

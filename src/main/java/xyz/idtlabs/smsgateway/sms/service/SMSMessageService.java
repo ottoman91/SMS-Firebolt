@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service; 
@@ -188,11 +189,8 @@ public class SMSMessageService {
 		}
 	} 
 
-	public List<SMSMessage> findMessagesByTenantId(final Long tenantId){
-		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByTenantId(tenantId);
-		if(smsMessages == null){
-			throw new SmsMessagesNotFoundException(tenantId);
-		}
+	public Page<SMSMessage> findMessagesByTenantId(final Long tenantId, final int page, final int size ){
+		Page<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findAllByTenantId(tenantId, new PageRequest(page, size));
 		return smsMessages;
 	} 
 
