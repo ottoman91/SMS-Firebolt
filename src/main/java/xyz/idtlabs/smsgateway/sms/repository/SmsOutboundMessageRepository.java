@@ -63,8 +63,8 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 
     Page<SMSMessage> findAllByTenantId(Long tenantId,Pageable pageable);  
 
-   @Query(value="SELECT * FROM m_outbound_messages s WHERE s.submitted_on_date >= :dateFrom AND s.submitted_on_date <= :dateTo AND s.id = :id ",nativeQuery=true)
-   List<SMSMessage> findByDatesAndId(@Param("dateFrom") Date dateFrom,@Param("dateTo") Date dateTo, @Param("id") Long id);
+   @Query(value="SELECT * FROM m_outbound_messages s WHERE s.submitted_on_date >= :dateFrom AND s.submitted_on_date <= :dateTo AND s.tenant_id = :id ",nativeQuery=true)
+   List<SMSMessage> findByDatesAndId(@Param("id") Long id, @Param("dateFrom") Date dateFrom,@Param("dateTo") Date dateTo);
 
 
 

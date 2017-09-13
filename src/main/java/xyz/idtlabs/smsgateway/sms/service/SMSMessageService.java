@@ -201,11 +201,11 @@ public class SMSMessageService {
 		} 
 		return smsMessage;
 	}   
-	public int showTotalMessagesSentBetweenDatesByTenant(final Date dateFrom, final Date dateTo, final Long tenantId){
-		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(dateFrom,dateTo,tenantId);
+	public int showTotalMessagesSentBetweenDatesByTenant(final Long tenantId, final Date dateFrom, final Date dateTo ){
+		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(tenantId,dateFrom,dateTo);
 		int numberofMessagesSent = smsMessages.size();
 		if(numberofMessagesSent == 0){
-			throw new SmsMessagesNotFoundException(tenantId);
+			return 0;
 		}
 		return numberofMessagesSent;
 	}

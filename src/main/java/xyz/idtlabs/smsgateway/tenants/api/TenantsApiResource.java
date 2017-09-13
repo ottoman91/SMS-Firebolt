@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Date;
 import java.text.DateFormat;
 import java.util.List; 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @RestController
@@ -51,6 +53,7 @@ public class TenantsApiResource {
 
     private final TenantsService tenantService ; 
     private final SMSMessageService smsMessageService;
+    private static final Logger logger = LoggerFactory.getLogger(TenantsApiResource.class);
 
     
     @Autowired
@@ -77,10 +80,10 @@ public class TenantsApiResource {
     
     @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public ResponseEntity<Tenant> getClient(@PathVariable("id") long id) {
-        System.out.println("Fetching Client with Id " + id);
+        logger.info("Fetching Client with Id " + id);
         Tenant tenant = tenantService.findTenantById(id);
         if (tenant == null) {
-            System.out.println("Tenant with id " + id + " not found");
+            logger.debug("Tenant with id " + id + " not found");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<Tenant>(tenant, HttpStatus.OK);
@@ -104,12 +107,12 @@ public class TenantsApiResource {
         //------------------- Delete a Client --------------------------------------------------------
     
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
-     public ResponseEntity<Tenant> deleteClient(@PathVariable("id") long id) {
-        System.out.println("Fetching & Deleting Client with id " + id);
+    public ResponseEntity<Tenant> deleteClient(@PathVariable("id") long id) {
+        logger.info("Fetching & Deleting Client with id " + id);
 
         Tenant tenant = tenantService.findTenantById(id);
         if (tenant == null) {
-            System.out.println("Unable to delete. Client " + id + " not found");
+            logger.debug("Unable to delete. Client " + id + " not found");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
         }
 
@@ -121,12 +124,12 @@ public class TenantsApiResource {
     
     @RequestMapping(value = "/{id}",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> updateClientName(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
-        System.out.println("Updating Client " + id);
+        logger.info("Updating Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
+            logger.debug("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }   
         String newName = tenant.getName(); 
@@ -144,12 +147,12 @@ public class TenantsApiResource {
     
     @RequestMapping(value = "/{id}/apikey",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Tenant> updateClientApiKey(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
-        System.out.println("Updating Client " + id);
+        logger.info("Updating Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
+            logger.debug("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
         String newApiKey = tenantService.generateApiKey();
@@ -164,12 +167,12 @@ public class TenantsApiResource {
     
     @RequestMapping(value = "/{id}/block",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<String> blockClient(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
-        System.out.println("Blocking Client " + id);
+        logger.info("Blocking Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
+            logger.debug("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
         String clientBlockedStatus = tenantService.blockClient(id);
@@ -182,12 +185,12 @@ public class TenantsApiResource {
     
     @RequestMapping(value = "/{id}/unblock",method = RequestMethod.PUT,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<String> unblockClient(@PathVariable("id") long id, @Validated @RequestBody final Tenant tenant) {
-        System.out.println("Unblocking Client " + id);
+        logger.info("Unblocking Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
+            logger.debug("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
         String clientBlockedStatus = tenantService.unblockClient(id);
@@ -202,7 +205,7 @@ public class TenantsApiResource {
     @RequestMapping(value = "/{id}/messages",params = {"page", "size"},method = RequestMethod.GET,consumes = {"application/json"})
     public Page<SMSMessage> listMessages(@PathVariable("id") long id,
             @RequestParam("page") int page, @RequestParam("size") int size) {
-        System.out.println("Listing Messages sent by Client " + id);
+        logger.info("Listing Messages sent by Client " + id);
         
         Page<SMSMessage> messages = smsMessageService.findMessagesByTenantId(id, page, size);
         if (page > messages.getTotalPages()) {
@@ -217,12 +220,12 @@ public class TenantsApiResource {
     
     @RequestMapping(value = "/{id}/messages/{messageId}",method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<SMSMessage> listMessage(@PathVariable("id") long id, @PathVariable("messageId") long messageId) {
-        System.out.println("Listing individual Message with id" + messageId + " sent by Client " + id);
+        logger.info("Listing individual Message with id" + messageId + " sent by Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
+            logger.debug("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }  
         SMSMessage message = smsMessageService.findMessageByTenantIdAndId(id,messageId);
@@ -236,15 +239,15 @@ public class TenantsApiResource {
     @RequestMapping(value = "/{id}/messages/stats", params = {"dateFrom", "dateTo"},method = RequestMethod.GET,consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<?> shrowMessageStatsWithinDateRange(@PathVariable("id") long id,
         @RequestParam("dateFrom") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateFrom, @RequestParam("dateTo") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateTo) {
-        System.out.println("Listing message stats between  " + dateFrom + " and " + dateTo + " sent by Client " + id);
+        logger.info("Listing message stats between  " + dateFrom + " and " + dateTo + " sent by Client " + id);
         
         Tenant currentTenant = tenantService.findTenantById(id);
         
         if (currentTenant==null) {
-            System.out.println("Client with id " + id + " not found");
+            logger.debug("Client with id " + id + " not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }    
-        int numberOfMessagesSent = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(dateFrom,dateTo,id);
+        int numberOfMessagesSent = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(id,dateFrom,dateTo);
         SentMessageStats sentMessageStats = new SentMessageStats();
         sentMessageStats.setNumberOfMessagesSent(numberOfMessagesSent);
         sentMessageStats.setStartingDate(dateFrom.toString());

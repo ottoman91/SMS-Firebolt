@@ -82,7 +82,7 @@ INSERT INTO `m_outbound_messages` (`tenant_id`,`internal_id`,`sms_bridge_id`,`mo
 VALUES (1,2,1,'123456',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'test message two');  
 
 INSERT INTO `m_outbound_messages` (`tenant_id`,`internal_id`,`sms_bridge_id`,`mobile_number`,`submitted_on_date`,`delivered_on_date`,`delivery_status`,`message`)
-VALUES (2,2,1,'123456',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'test message three'); 
+VALUES (2,3,1,'123456',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'test message three'); 
 
 
 

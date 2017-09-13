@@ -30,7 +30,9 @@ public class SentMessageStats {
 
     private String startingDate;
 
-    private String endingDate; 
+    private String endingDate;  
+
+    
 
     public void setNumberOfMessagesSent(final int numberOfMessagesSent){
         this.numberOfMessagesSent = numberOfMessagesSent;
