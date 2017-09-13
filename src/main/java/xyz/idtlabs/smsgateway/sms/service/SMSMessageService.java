@@ -203,11 +203,8 @@ public class SMSMessageService {
 	}   
 	public int showTotalMessagesSentBetweenDatesByTenant(final Long tenantId, final Date dateFrom, final Date dateTo ){
 		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(tenantId,dateFrom,dateTo);
-		int numberofMessagesSent = smsMessages.size();
-		if(numberofMessagesSent == 0){
-			return 0;
-		}
-		return numberofMessagesSent;
+		return smsMessages.size();
+		
 	}
 
 
