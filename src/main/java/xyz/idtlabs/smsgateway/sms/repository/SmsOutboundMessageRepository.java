@@ -27,6 +27,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param; 
+import java.util.Date;
+import org.springframework.data.jpa.repository.Query;
+
 
 @Repository
 public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, Long>, JpaSpecificationExecutor<SMSMessage> {
@@ -46,7 +50,7 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 	 * @param externalId -- {@link SmsMessageStatusType} externalId
 	 * @return {@link SmsMessageStatusType}
 	 **/
-    SMSMessage findByExternalId(String externalId);
+    SMSMessage findByExternalId(String externalId); 
 	
 	/** 
 	 * find {@link SmsMessageStatusType} objects with id in "idList" and mifosTenantIdentifier equal to "mifosTenantIdentifier"
@@ -55,5 +59,13 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 	 * @param mifosTenantIdentifier -- Mifos X tenant identifier e.g. demo
 	 * @return List of {@link SmsMessageStatusType} objects
 	 **/
-	List<SMSMessage> findByIdInAndTenantId(List<Long> idList, String mifosTenantIdentifier);
+	SMSMessage findByTenantIdAndId(@Param("tenantId") final Long tenantId, @Param("id") final Long id); 
+
+    Page<SMSMessage> findAllByTenantId(Long tenantId,Pageable pageable);  
+
+   @Query(value="SELECT * FROM m_outbound_messages s WHERE s.submitted_on_date >= :dateFrom AND s.submitted_on_date <= :dateTo AND s.tenant_id = :id ",nativeQuery=true)
+   List<SMSMessage> findByDatesAndId(@Param("id") Long id, @Param("dateFrom") Date dateFrom,@Param("dateTo") Date dateTo);
+
+
+
 }

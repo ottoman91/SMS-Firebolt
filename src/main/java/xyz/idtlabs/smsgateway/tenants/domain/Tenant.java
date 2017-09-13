@@ -42,7 +42,7 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	private String displayName; 
 
 	@Column(name="blocked",nullable = true)
-	private boolean blocked;
+	private boolean blocked; 
 	
 	protected Tenant() { }
 	
@@ -90,6 +90,8 @@ public class Tenant extends AbstractPersistableCustom<Long> {
 	public boolean setBlocked(boolean blocked){
 		this.blocked = blocked; 
 		return blocked;
-	}
+	} 
+
+
 
 }

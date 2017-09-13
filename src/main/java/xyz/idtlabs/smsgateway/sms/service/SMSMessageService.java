@@ -36,16 +36,23 @@ import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.providers.SMSProviderFactory;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
-import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType;
+import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType; 
+import xyz.idtlabs.smsgateway.sms.exception.SmsMessagesNotFoundException;
+import xyz.idtlabs.smsgateway.sms.exception.SmsMessageNotFoundException;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; 
+import java.util.List; 
+import java.util.Date;
+
+
 
 @Service
 public class SMSMessageService {
@@ -180,5 +187,25 @@ public class SMSMessageService {
 			}while (page < totalPageSize);
 			return totalPageSize;
 		}
+	} 
+
+	public Page<SMSMessage> findMessagesByTenantId(final Long tenantId, final int page, final int size ){
+		Page<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findAllByTenantId(tenantId, new PageRequest(page, size));
+		return smsMessages;
+	} 
+
+	public SMSMessage findMessageByTenantIdAndId(final Long tenantId, final long messageId){
+		SMSMessage smsMessage = this.smsOutboundMessageRepository.findByTenantIdAndId(tenantId,messageId);
+		if(smsMessage == null){
+			throw new SmsMessageNotFoundException(tenantId,messageId);
+		} 
+		return smsMessage;
+	}   
+	public int showTotalMessagesSentBetweenDatesByTenant(final Long tenantId, final Date dateFrom, final Date dateTo ){
+		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(tenantId,dateFrom,dateTo);
+		return smsMessages.size();
+		
 	}
+
+
 }

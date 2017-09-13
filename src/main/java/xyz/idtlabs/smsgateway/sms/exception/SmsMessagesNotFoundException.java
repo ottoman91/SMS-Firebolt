@@ -19,13 +19,13 @@
 package xyz.idtlabs.smsgateway.sms.exception;
 
 @SuppressWarnings("serial")
-public class SmsMessageNotFoundException extends RuntimeException {
-    
+public class SmsMessagesNotFoundException extends RuntimeException {
+	
     /** 
-     * SmsMessageNotFoundException constructor
-     * @param message the exception message
-     **/
-    public SmsMessageNotFoundException(final Long tenantId, final Long id) {
-        super("No message with id" + id + " sent from client with id " + tenantId);
-    }
+	 * SmsMessageNotFoundException constructor
+	 * @param message the exception message
+	 **/
+	public SmsMessagesNotFoundException(final Long tenantId) {
+		super("No messages sent from client with id " + tenantId);
+	}
 }
