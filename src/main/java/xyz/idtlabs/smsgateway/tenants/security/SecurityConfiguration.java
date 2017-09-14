@@ -30,6 +30,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy; 
 import org.springframework.security.provisioning.InMemoryUserDetailsManager; 
 import org.springframework.core.io.Resource; 
@@ -46,6 +47,7 @@ import java.util.logging.*;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
     private static String REALM="SMS_FIREBOLT_REALM"; 
@@ -81,7 +83,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   
       http.csrf().disable()
         .authorizeRequests()
-        .antMatchers("/user/**").hasRole("ADMIN")
+        .antMatchers("/").access("hasRole('ADMIN') or hasRole('USER')")
         .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//We don't need sessions to be created.
     }

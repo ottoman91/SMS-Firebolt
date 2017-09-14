@@ -28,6 +28,9 @@ import org.springframework.stereotype.Service;
 import java.util.List; 
 import org.springframework.data.domain.Page; 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 
 
 
@@ -46,7 +49,7 @@ public class TenantsService {
 	}
 	
 
-
+    @PreAuthorize("hasRole('ADMIN')")
 	public Tenant createTenant(final Tenant tenant){
 		tenant.setApiKey(this.securityService.generateApiKey());
 		this.tenantRepository.save(tenant);
@@ -96,17 +99,21 @@ public class TenantsService {
 	// 	return tenants;
 	// } 
 
+    @PreAuthorize("hasRole('ADMIN')")
 	public void deleteTenantById(final long id) {
 		Tenant tenant = this.tenantRepository.findById(id) ; 
 		this.tenantRepository.delete(tenant);
 
 	}  
 
+    @PreAuthorize("hasRole('ADMIN')")
 	public void deleteTenantByName(final String name) {
 		Tenant tenant = this.tenantRepository.findByName(name) ; 
 		this.tenantRepository.delete(tenant);
 
 	} 
+
+    @PreAuthorize("hasRole('ADMIN')")
 	public Tenant updateTenant(final Tenant tenant) {
 		this.tenantRepository.save(tenant);
 		return tenant ;
@@ -121,11 +128,14 @@ public class TenantsService {
 			return true;
 		}
 	} 
+
+    @PreAuthorize("hasRole('ADMIN')")
 	public String generateApiKey(){
         String newApiKey = this.securityService.generateApiKey();
         return newApiKey;
     } 
 
+    @PreAuthorize("hasRole('ADMIN')")
     public String blockClient(final long id){
     	Tenant tenant = this.tenantRepository.findById(id);
     	boolean blockedStatus = tenant.getBlocked();
@@ -140,6 +150,7 @@ public class TenantsService {
     	}
     }  
 
+    @PreAuthorize("hasRole('ADMIN')")
     public String unblockClient(final long id){
     	Tenant tenant = this.tenantRepository.findById(id);
     	boolean blockedStatus = tenant.getBlocked();
