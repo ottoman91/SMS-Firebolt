@@ -52,7 +52,7 @@ public class SmsApiResource {
         this.tenantService = tenantService;
     } 
 
-    //-------------------Send Message via HTTP Send API--------------------------------------------------------
+    //-------------------Send Message via HTTP GET Request--------------------------------------------------------
     
     @RequestMapping(value="/http/send",params = {"apiKey", "to","body"},method = RequestMethod.GET) 
     public ResponseEntity<?> sendMessageViaHttp(
@@ -61,7 +61,25 @@ public class SmsApiResource {
         tenantService.confirmClientCanSendSms(apiKey);  
         smsMessageService.validateMessageAndDestination(to,body); 
         smsMessageService.sendSMS(apiKey,to,body);
-        //smsMessageService.checkForDuplicateNumbers(to);
+        SubmittedMessages submittedMessages = new SubmittedMessages();
+        submittedMessages.setTo(to);
+        submittedMessages.setId(apiKey);
+ 
+        return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
+    } 
+
+    //-------------------Send Message via REST POST Request--------------------------------------------------------
+    
+    @RequestMapping(method = RequestMethod.POST,
+        consumes = {"application/json"}, produces = {"application/json"}) 
+    public ResponseEntity<?> sendMessageViaRest(
+        @RequestHeader(MessageGatewayConstants.TENANT_APPKEY_HEADER) 
+        final String apiKey, @RequestBody final SMSMessage smsMessage) { 
+        String to = smsMessage.getMobileNumber();
+        String body = smsMessage.getMessage();  
+        tenantService.confirmClientCanSendSms(apiKey);
+        smsMessageService.validateMessageAndDestination(to,body); 
+        smsMessageService.sendSMS(apiKey,to,body);
         SubmittedMessages submittedMessages = new SubmittedMessages();
         submittedMessages.setTo(to);
         submittedMessages.setId(apiKey);
@@ -69,13 +87,13 @@ public class SmsApiResource {
         return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<Void> sendShortMessages(@RequestHeader(MessageGatewayConstants.TENANT_IDENTIFIER_HEADER) final String tenantId,
-    		@RequestHeader(MessageGatewayConstants.TENANT_APPKEY_HEADER) final String appKey, 
-    		@RequestBody final List<SMSMessage> payload) {
-    	this.smsMessageService.sendShortMessage(tenantId, appKey, payload);
-       return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
+    // @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
+    // public ResponseEntity<Void> sendShortMessages(@RequestHeader(MessageGatewayConstants.TENANT_IDENTIFIER_HEADER) final String tenantId,
+    // 		@RequestHeader(MessageGatewayConstants.TENANT_APPKEY_HEADER) final String appKey, 
+    // 		@RequestBody final List<SMSMessage> payload) {
+    // 	this.smsMessageService.sendShortMessage(tenantId, appKey, payload);
+    //    return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    // }
     
     @RequestMapping(value = "/report", method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<Collection<DeliveryStatusData>> getDeliveryStatus(@RequestHeader(MessageGatewayConstants.TENANT_IDENTIFIER_HEADER) final String tenantId,
