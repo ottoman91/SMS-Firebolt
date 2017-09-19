@@ -39,6 +39,11 @@ import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
 import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType; 
 import xyz.idtlabs.smsgateway.sms.exception.SmsMessagesNotFoundException;
 import xyz.idtlabs.smsgateway.sms.exception.SmsMessageNotFoundException;
+import xyz.idtlabs.smsgateway.sms.exception.DuplicateDestinationAddressException;
+import xyz.idtlabs.smsgateway.sms.exception.MessageBodyIsEmptyException;
+import xyz.idtlabs.smsgateway.sms.exception.MessageBodyOverLimit;
+import xyz.idtlabs.smsgateway.sms.exception.DestinationIsEmptyException; 
+import xyz.idtlabs.smsgateway.sms.exception.DestinationNumberFormatError;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +56,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service; 
 import java.util.List; 
 import java.util.Date;
-
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections; 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 
 @Service
@@ -205,6 +214,59 @@ public class SMSMessageService {
 		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(tenantId,dateFrom,dateTo);
 		return smsMessages.size();
 		
+	}  
+
+	private void checkForEmptyMessage(final String message){
+		if(message.equals(null) || message.equals(""))
+			throw new MessageBodyIsEmptyException();
+	}  
+
+	private void checkForMessageSize(final String message){
+		if(message.length() > 160)
+			throw new MessageBodyOverLimit();
+	}  
+
+
+	private void checkForEmptyDestination(final String number){
+		if(number.equals(null) || number.equals(""))
+			throw new DestinationIsEmptyException();
+	}
+
+	private void checkForDuplicateNumbers(final String numbers){
+		List<String> individualNumbers = Arrays.asList(numbers.split(","));
+		List<String> duplicateNumbers = new ArrayList<String>();
+        for (String number : individualNumbers) {
+            if(Collections.frequency(individualNumbers, number) > 1) {
+            duplicateNumbers.add(number);
+            }
+        } 
+        if (duplicateNumbers.size() != 0){
+        	throw new DuplicateDestinationAddressException();
+        }
+	}  
+
+	private void checkForNumberFormat(final String numbers){
+		List<String> individualNumbers = Arrays.asList(numbers.split(",")); 
+		//String regex = "^\\+(?:[0-9] ?){6,14}[0-9]$";
+		String regex = "^\\+232.*";
+		Pattern pattern = Pattern.compile(regex);
+		for ( String number: individualNumbers){ 
+			Matcher match = pattern.matcher(number);
+			if(!match.find()){
+				throw new DestinationNumberFormatError();
+			}
+		}
+	}
+	
+
+	public void validateMessageAndDestination(final String number, final String message){
+
+		checkForEmptyMessage(message);
+		checkForMessageSize(message);
+		checkForEmptyDestination(number);
+		checkForDuplicateNumbers(number);
+		checkForNumberFormat(number);
+
 	}
 
 

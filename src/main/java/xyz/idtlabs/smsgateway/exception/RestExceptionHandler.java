@@ -18,7 +18,14 @@
  */
 package xyz.idtlabs.smsgateway.exception;
 
-import xyz.idtlabs.smsgateway.tenants.exception.TenantExists;
+import xyz.idtlabs.smsgateway.tenants.exception.TenantExists; 
+import xyz.idtlabs.smsgateway.tenants.exception.InvalidApiKeyException;
+import xyz.idtlabs.smsgateway.tenants.exception.ClientBlockedException;
+import xyz.idtlabs.smsgateway.sms.exception.DuplicateDestinationAddressException;
+import xyz.idtlabs.smsgateway.sms.exception.MessageBodyIsEmptyException;
+import xyz.idtlabs.smsgateway.sms.exception.MessageBodyOverLimit;
+import xyz.idtlabs.smsgateway.sms.exception.DestinationIsEmptyException;
+import xyz.idtlabs.smsgateway.sms.exception.DestinationNumberFormatError;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.core.Ordered;
@@ -63,10 +70,26 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex, HttpHeaders headers,
-            HttpStatus status, WebRequest request) {
+            HttpStatus status, WebRequest request) { 
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         String error = ex.getParameterName() + " parameter is missing";
-        return buildResponseEntity(new ApiError(BAD_REQUEST, error, ex));
-    }
+        apiError.setMessage(error); 
+        apiError.setDebugMessage(ex.getLocalizedMessage());
+        return buildResponseEntity(apiError);
+    }  
+
+        
+    // @ExceptionHandler({MissingServletRequestParameterException.class})
+    // protected ResponseEntity<Object> handleMissingServletRequestParameter(
+    //         MissingServletRequestParameterException ex, HttpHeaders headers,
+    //         HttpStatus status, WebRequest request) {  
+
+    //     ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+    //     apiError.setMessage("Missing request parameter" + ex.getParameterName());
+    //     return buildResponseEntity(apiError);
+    // }  
+
+   
 
 
     /**
@@ -213,7 +236,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     // }  
 
    
-
+    /**
+     * Handle Exception When ReCreating already existing Client
+     */
 
    @ExceptionHandler(TenantExists.class)
    protected ResponseEntity<Object> tenantExists(
@@ -221,7 +246,98 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
        ApiError apiError = new ApiError(HttpStatus.CONFLICT);
        apiError.setMessage("The client already exists");
        return buildResponseEntity(apiError);
-   }
+   } 
+
+   /**
+     * Handle Exception When ApiKey is invalid
+     */
+   @ExceptionHandler(InvalidApiKeyException.class)
+   protected ResponseEntity<Object> invalidApiKeyException(
+           InvalidApiKeyException ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Invalid or missing API Key");
+       apiError.setDebugMessage("The API key is either incorrect or has not been included in the API call.");
+       apiError.setErrorCode("invalid_key");
+       return buildResponseEntity(apiError);
+   }  
+
+     /**
+     * Handle Exception When Client is Blocked and Cannot Send a Message 
+     */
+   @ExceptionHandler(ClientBlockedException.class)
+   protected ResponseEntity<Object> clientBlockedException(
+           ClientBlockedException ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Account is not active.");
+       apiError.setDebugMessage("The account is not active.");
+       apiError.setErrorCode("account_inactive");
+       return buildResponseEntity(apiError);
+   }  
+
+      /**
+     * Handle Exception When Destination Number is Repeated 
+     */
+   @ExceptionHandler(DuplicateDestinationAddressException.class)
+   protected ResponseEntity<Object> duplicateDestinationAddressException(
+           DuplicateDestinationAddressException ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Duplicated destination address found.");
+       apiError.setDebugMessage("The destination number you are attempting to send to is duplicated.");
+       apiError.setErrorCode("duplicate_number");
+       return buildResponseEntity(apiError);
+   }  
+
+    /**
+    * Handle Exception When Message Body is Empty 
+    */
+   @ExceptionHandler(MessageBodyIsEmptyException.class)
+   protected ResponseEntity<Object> messageBodyIsEmptyException(
+           MessageBodyIsEmptyException ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Empty message content.");
+       apiError.setDebugMessage("Message content is empty.");
+       apiError.setErrorCode("empty_body");
+       return buildResponseEntity(apiError);
+   }  
+
+     /**
+    * Handle Exception When Message Body is Over 160 characters long 
+     */
+   @ExceptionHandler(MessageBodyOverLimit.class)
+   protected ResponseEntity<Object> messageBodyOverLimit(
+           MessageBodyOverLimit ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Message character over limit.");
+       apiError.setDebugMessage("Message is over 160 chars long.");
+       apiError.setErrorCode("body_over_limit");
+       return buildResponseEntity(apiError);
+   } 
+ 
+    /**
+    * Handle Exception When Message Body is Over 160 characters long 
+     */
+   @ExceptionHandler(DestinationIsEmptyException.class)
+   protected ResponseEntity<Object> destinationIsEmptyException(
+           DestinationIsEmptyException ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Empty receivers list.");
+       apiError.setDebugMessage("Destination list is empty.");
+       apiError.setErrorCode("empty_number_list");
+       return buildResponseEntity(apiError);
+   } 
+
+/**
+    * Handle Exception When Destination Number Format is Incorrect 
+     */
+   @ExceptionHandler(DestinationNumberFormatError.class)
+   protected ResponseEntity<Object> destinationNumberFormatError(
+           DestinationNumberFormatError ex) {
+       ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+       apiError.setMessage("Invalid destination address.");
+       apiError.setDebugMessage("The destination number you are attempting to send to is invalid.");
+       apiError.setErrorCode("invalid_number");
+       return buildResponseEntity(apiError);
+   } 
 
 
 

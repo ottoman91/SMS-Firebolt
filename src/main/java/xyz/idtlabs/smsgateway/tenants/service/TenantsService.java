@@ -21,7 +21,9 @@ package xyz.idtlabs.smsgateway.tenants.service;
 import xyz.idtlabs.smsgateway.service.SecurityService;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException; 
-import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException;
+import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException; 
+import xyz.idtlabs.smsgateway.tenants.exception.InvalidApiKeyException;
+import xyz.idtlabs.smsgateway.tenants.exception.ClientBlockedException;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service; 
@@ -163,7 +165,22 @@ public class TenantsService {
     		this.tenantRepository.save(tenant);
     		return "Client has been unblocked now";
     	}
-    } 
+    }  
+
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public void confirmClientCanSendSms(final String apiKey){
+        Tenant tenant = this.tenantRepository.findByApiKey(apiKey);
+        if(tenant == null){
+            throw new InvalidApiKeyException();
+        } 
+        else{ 
+            boolean blockedStatus = tenant.getBlocked();
+            if(blockedStatus == true){
+                throw new ClientBlockedException();
+            }
+
+        }
+    }
 
 
 }
