@@ -59,7 +59,8 @@ public class SmsApiResource {
       @RequestParam(value="apiKey",required=true) String apiKey,  @RequestParam(value="to",required=true) String to,
                     @RequestParam(value="body",required=true) String body) {
         tenantService.confirmClientCanSendSms(apiKey);  
-        smsMessageService.validateMessageAndDestination(to,body);
+        smsMessageService.validateMessageAndDestination(to,body); 
+        smsMessageService.sendSMS(apiKey,to,body);
         //smsMessageService.checkForDuplicateNumbers(to);
         SubmittedMessages submittedMessages = new SubmittedMessages();
         submittedMessages.setTo(to);

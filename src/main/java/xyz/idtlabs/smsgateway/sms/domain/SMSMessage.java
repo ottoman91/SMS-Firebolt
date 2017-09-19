@@ -87,6 +87,13 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 		this.mobileNumber = mobileNumber;
 		this.message = message;
 		this.bridgeId = bridgeId;
+	} 
+
+	public SMSMessage(final long tenantId, final String mobileNumber, final Date submittedOnDate, final String message){
+		this.tenantId = tenantId;
+		this.mobileNumber = mobileNumber;
+		this.submittedOnDate = submittedOnDate;
+		this.message = message;
 	}
 
 	public static SMSMessage getPendingMessages(final String externalId, final Long internalId,
