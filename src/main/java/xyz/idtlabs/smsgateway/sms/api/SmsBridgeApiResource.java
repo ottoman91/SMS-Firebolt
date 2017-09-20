@@ -91,18 +91,18 @@ public class SmsBridgeApiResource {
 		return new ResponseEntity<>(bridge, HttpStatus.OK);
     }
     
-    @ExceptionHandler({PlatformApiDataValidationException.class})
-    public ResponseEntity<ApiGlobalErrorResponse> handlePlatformApiDataValidationException(PlatformApiDataValidationException e) {
-    	return PlatformApiDataValidationExceptionMapper.toResponse(e) ;
-    }
+    // @ExceptionHandler({PlatformApiDataValidationException.class})
+    // public ResponseEntity<ApiGlobalErrorResponse> handlePlatformApiDataValidationException(PlatformApiDataValidationException e) {
+    // 	return PlatformApiDataValidationExceptionMapper.toResponse(e) ;
+    // }
     
-    @ExceptionHandler({UnsupportedParameterException.class})
-    public ResponseEntity<ApiGlobalErrorResponse> handleUnsupportedParameterException(UnsupportedParameterException e) {
-    	return UnsupportedParameterExceptionMapper.toResponse(e) ;
-    }
+    // @ExceptionHandler({UnsupportedParameterException.class})
+    // public ResponseEntity<ApiGlobalErrorResponse> handleUnsupportedParameterException(UnsupportedParameterException e) {
+    // 	return UnsupportedParameterExceptionMapper.toResponse(e) ;
+    // }
     
-    @ExceptionHandler({SMSBridgeNotFoundException.class})
-    public ResponseEntity<ApiGlobalErrorResponse> handleSMSBridgeNotFoundException(SMSBridgeNotFoundException e) {
-    	return PlatformResourceNotFoundExceptionMapper.toResponse(e) ;
-    }
+    // @ExceptionHandler({SMSBridgeNotFoundException.class})
+    // public ResponseEntity<ApiGlobalErrorResponse> handleSMSBridgeNotFoundException(SMSBridgeNotFoundException e) {
+    // 	return PlatformResourceNotFoundExceptionMapper.toResponse(e) ;
+    // }
 }

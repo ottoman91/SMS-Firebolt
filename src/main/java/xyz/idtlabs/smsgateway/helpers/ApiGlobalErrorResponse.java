@@ -188,7 +188,8 @@ public class ApiGlobalErrorResponse {
         globalErrorResponse.setErrors(errors);
 
         return globalErrorResponse;
-    }
+    } 
+
 
     protected ApiGlobalErrorResponse() {
         //
