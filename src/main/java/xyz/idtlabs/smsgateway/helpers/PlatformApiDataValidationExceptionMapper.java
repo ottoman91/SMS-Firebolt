@@ -35,6 +35,11 @@ public class PlatformApiDataValidationExceptionMapper {
     public static ResponseEntity<ApiGlobalErrorResponse> toResponse(final PlatformApiDataValidationException exception) {
         final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.badClientRequest(
                 exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
-        return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.BAD_REQUEST) ;
-    }
+        return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR) ;
+    }  
+
+  
+
+
+    
 }

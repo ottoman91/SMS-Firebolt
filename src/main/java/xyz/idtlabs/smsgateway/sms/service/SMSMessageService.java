@@ -32,6 +32,8 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import xyz.idtlabs.smsgateway.service.SecurityService;
+import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
+import xyz.idtlabs.smsgateway.helpers.ApiParameterError;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.providers.SMSProviderFactory;
@@ -78,8 +80,17 @@ public class SMSMessageService {
 	
 	private ScheduledExecutorService scheduledExecutorService ;
 	
-	private final SecurityService securityService ;
-	
+	private final SecurityService securityService ;  
+
+	private String defaultUserMessage;
+
+	private String developerMessage;
+
+	private String errorCode;  
+
+	private final List<ApiParameterError> errors = new ArrayList<>();
+
+
 	
 	@Autowired
 	public SMSMessageService(final SmsOutboundMessageRepository smsOutboundMessageRepository,
@@ -261,7 +272,17 @@ public class SMSMessageService {
 		for ( String number: individualNumbers){ 
 			Matcher match = pattern.matcher(number);
 			if(!match.find()){
-				throw new DestinationNumberFormatError();
+				//throw new DestinationNumberFormatError(); 
+				defaultUserMessage = "Invalid destination address";
+				developerMessage = "The destination number you are attempting to send to is invalid";
+				errorCode = "invalid_number";
+				ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				    defaultUserMessage,developerMessage,"date","date");
+				//apiParameterError.setDeveloperMessage(developerMessage);
+				//apiParameterError.setDefaultUserMessage(defaultUserMessage);
+				//apiParameterError.setUserMessageGlobalisationCode(errorCode); 
+				errors.add(apiParameterError);
+				throw new PlatformApiDataValidationException(errors);
 			}
 		}
 	}

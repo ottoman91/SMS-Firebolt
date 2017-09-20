@@ -27,7 +27,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * Exception thrown when problem with an API request to the platform.
  */
-@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="PlatformApiDataValidationException")
+//@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="PlatformApiDataValidationException")
+@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR, reason="PlatformApiDataValidationException")
 public class PlatformApiDataValidationException extends RuntimeException {
 
     private final String globalisationMessageCode;
@@ -45,7 +46,9 @@ public class PlatformApiDataValidationException extends RuntimeException {
         this.globalisationMessageCode = globalisationMessageCode;
         this.defaultUserMessage = defaultUserMessage;
         this.errors = errors;
-    }
+    } 
+
+   
 
     public String getGlobalisationMessageCode() {
         return this.globalisationMessageCode;

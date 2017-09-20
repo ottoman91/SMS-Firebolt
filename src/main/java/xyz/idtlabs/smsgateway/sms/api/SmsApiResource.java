@@ -23,7 +23,11 @@ import java.util.List;
 
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants; 
 import xyz.idtlabs.smsgateway.exception.ApiError;
+import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
+import xyz.idtlabs.smsgateway.helpers.PlatformApiDataValidationExceptionMapper;
+import xyz.idtlabs.smsgateway.helpers.PlatformResourceNotFoundExceptionMapper;
+import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
 import xyz.idtlabs.smsgateway.sms.domain.SubmittedMessages;
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService; 
@@ -31,6 +35,7 @@ import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +61,7 @@ public class SmsApiResource {
     
     @RequestMapping(value="/http/send",params = {"apiKey", "to","body"},method = RequestMethod.GET) 
     public ResponseEntity<?> sendMessageViaHttp(
-      @RequestParam(value="apiKey",required=true) String apiKey,  @RequestParam(value="to",required=true) String to,
+      @RequestParam(value="apiKey") String apiKey,  @RequestParam(value="to") String to,
                     @RequestParam(value="body",required=true) String body) {
         tenantService.confirmClientCanSendSms(apiKey);  
         smsMessageService.validateMessageAndDestination(to,body); 
@@ -101,5 +106,10 @@ public class SmsApiResource {
     		@RequestBody final Collection<Long> internalIds) {
     	Collection<DeliveryStatusData> deliveryStatus = this.smsMessageService.getDeliveryStatus(tenantId, appKey, internalIds) ;
     	return new ResponseEntity<>(deliveryStatus, HttpStatus.OK);
+    } 
+
+    @ExceptionHandler({PlatformApiDataValidationException.class})
+    public ResponseEntity<ApiGlobalErrorResponse> handlePlatformApiDateValidationException(PlatformApiDataValidationException e) {
+     return PlatformApiDataValidationExceptionMapper.toResponse(e);
     }
 }
