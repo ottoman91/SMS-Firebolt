@@ -45,6 +45,8 @@ import java.text.DateFormat;
 import java.util.List; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.logging.*;
+
 
 
 @RestController
@@ -82,9 +84,10 @@ public class TenantsApiResource {
         logger.info("Fetching Client with Id " + id);
         Tenant tenant = tenantService.findTenantById(id);
         if (tenant == null) {
-            logger.debug("Tenant with id " + id + " not found");
+            //logger.debug("Tenant with id " + id + " not found");
+            logger.error("test");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
-        }
+        }  
         return new ResponseEntity<Tenant>(tenant, HttpStatus.OK);
     } 
 

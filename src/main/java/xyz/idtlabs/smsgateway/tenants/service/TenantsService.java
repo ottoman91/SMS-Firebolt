@@ -77,7 +77,7 @@ public class TenantsService {
 	public Tenant findTenantById(final long id) {
 		Tenant tenant = this.tenantRepository.findById(id) ;
 		if(tenant == null) {
-			throw new TenantNotFoundException(id, "") ;
+		   throw new TenantNotFoundException(id, "") ;
 		}
 		return tenant ;
 	}  
