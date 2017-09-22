@@ -58,7 +58,7 @@ dependencies {
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.2.0.RELEASE'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.1'
     compile 'org.projectlombok:lombok:1.16.18'
-    compile 'io.sentry:sentry-logback:1.5.3'
+    compile 'io.sentry:sentry-spring:1.5.3'
     compile 'org.apache.commons:commons-lang3:3.4'
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 
