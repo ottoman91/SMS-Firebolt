@@ -36,6 +36,12 @@ public class PlatformApiDataValidationExceptionMapper {
         final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.badClientRequest(
                 exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
         return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR) ;
+    }   
+
+    public static ResponseEntity<ApiGlobalErrorResponse> sendMessageDataValidationException(final PlatformApiDataValidationException exception) {
+        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.sendMessageDataValidationError(
+                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
+        return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR) ;
     }  
 
   

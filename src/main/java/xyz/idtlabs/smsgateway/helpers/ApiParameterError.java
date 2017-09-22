@@ -76,6 +76,13 @@ public class ApiParameterError {
         final ApiParameterError error = new ApiParameterError(globalisationMessageCode, defaultUserMessage, defaultUserMessageArgs);
         error.setParameterName(parameterName);
         return error;
+    } 
+
+    public static ApiParameterError parameterError(final String globalisationMessageCode, final String defaultUserMessage,
+            final String parameterName, final String developerMessage) {
+        final ApiParameterError error = new ApiParameterError(globalisationMessageCode, defaultUserMessage, developerMessage);
+        error.setParameterName(parameterName);
+        return error;
     }
 
     protected ApiParameterError() {
@@ -101,6 +108,14 @@ public class ApiParameterError {
         this.args = messageArgs;
 
         this.parameterName = "id";
+    } 
+
+
+    private ApiParameterError(final String globalisationMessageCode, final String defaultUserMessage, final String developerMessage) {
+        this.userMessageGlobalisationCode = globalisationMessageCode;
+        this.developerMessage = developerMessage;
+        this.defaultUserMessage = defaultUserMessage;
+
     }
 
     public String getDeveloperMessage() {

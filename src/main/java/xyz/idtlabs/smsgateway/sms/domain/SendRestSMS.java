@@ -20,48 +20,46 @@ package xyz.idtlabs.smsgateway.sms.domain;
 
 import java.util.Date;
 import java.text.DateFormat; 
+import java.util.ArrayList;
+import java.util.List; 
 
 
 
 
 
-public class SubmittedMessages {
+public class SendRestSMS {
 
-    private String id;  
+    private String body;  
 
-    private boolean accepted;
+    private List<String> to; 
 
-    private String to;  
+    SendRestSMS(){
+        this.to = new ArrayList<>();
+    }
 
 
   
 
     
 
-    public void setId(final String id){
-        this.id = id;
+    public void setBody(final String body){
+        this.body = body;
     } 
 
-    public String getId(){
-        return id;
+    public String getBody(){
+        return body;
     } 
 
-    public void setAccepted(){
-        this.accepted = true;
+    public void setTo(final List<String> to){
+        this.to = (to == null) ? new ArrayList<>() : new ArrayList<>(to);
     }
     
-    public boolean getAccepted(){
-        return accepted;
+    public List<String> getTo(){
+        return new ArrayList(to);
     }
 
     
-    public void setTo(final String to) {
-        this.to = to ;
-    }
     
-    public String getTo() {
-        return to ;
-    } 
 
   
 

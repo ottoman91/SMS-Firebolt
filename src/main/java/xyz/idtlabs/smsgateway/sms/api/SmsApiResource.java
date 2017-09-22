@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants; 
-import xyz.idtlabs.smsgateway.exception.ApiError;
 import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.helpers.PlatformApiDataValidationExceptionMapper;
@@ -30,6 +29,7 @@ import xyz.idtlabs.smsgateway.helpers.PlatformResourceNotFoundExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
 import xyz.idtlabs.smsgateway.sms.domain.SubmittedMessages;
+import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService; 
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +42,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;   
 import org.springframework.web.bind.annotation.RestController; 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
 
 @RestController
 @RequestMapping("/messages")
@@ -50,6 +54,8 @@ public class SmsApiResource {
 	//This class sends TRANSACTIONAL & PROMOTIONAL SMS
 	private SMSMessageService smsMessageService ;
     private TenantsService tenantService;
+    private static final Logger logger = LoggerFactory.getLogger(SMSMessageService.class);
+
 	
 	@Autowired
     public SmsApiResource(final SMSMessageService smsMessageService, final TenantsService tenantService) {
@@ -57,7 +63,7 @@ public class SmsApiResource {
         this.tenantService = tenantService;
     } 
 
-    //-------------------Send Message via HTTP GET Request--------------------------------------------------------
+   // -------------------Send Message via HTTP GET Request--------------------------------------------------------
     
     @RequestMapping(value="/http/send",params = {"apiKey", "to","body"},method = RequestMethod.GET) 
     public ResponseEntity<?> sendMessageViaHttp(
@@ -68,27 +74,31 @@ public class SmsApiResource {
         smsMessageService.sendSMS(apiKey,to,body);
         SubmittedMessages submittedMessages = new SubmittedMessages();
         submittedMessages.setTo(to);
-        submittedMessages.setId(apiKey);
+        submittedMessages.setId(apiKey); 
+        submittedMessages.setAccepted();
  
         return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
-    } 
+    }  
 
-    //-------------------Send Message via REST POST Request--------------------------------------------------------
+  
+
+
+      //-------------------Send Message via REST POST Request--------------------------------------------------------
     
-    @RequestMapping(method = RequestMethod.POST,
-        consumes = {"application/json"}, produces = {"application/json"}) 
+    @RequestMapping(method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"}) 
     public ResponseEntity<?> sendMessageViaRest(
         @RequestHeader(MessageGatewayConstants.TENANT_APPKEY_HEADER) 
-        final String apiKey, @RequestBody final SMSMessage smsMessage) { 
-        String to = smsMessage.getMobileNumber();
-        String body = smsMessage.getMessage();  
+        final String apiKey, @RequestBody final SendRestSMS smsMessage) { 
+        List<String> to = smsMessage.getTo(); 
+        String numbers = StringUtils.join(to, ',');
+        String body = smsMessage.getBody();
         tenantService.confirmClientCanSendSms(apiKey);
-        smsMessageService.validateMessageAndDestination(to,body); 
-        smsMessageService.sendSMS(apiKey,to,body);
+        smsMessageService.validateMessageAndDestination(numbers,body); 
+        smsMessageService.sendSMS(apiKey,numbers,body);
         SubmittedMessages submittedMessages = new SubmittedMessages();
-        submittedMessages.setTo(to);
+        submittedMessages.setTo(numbers);
         submittedMessages.setId(apiKey);
- 
+        submittedMessages.setAccepted();
         return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
     }
 
@@ -110,6 +120,6 @@ public class SmsApiResource {
 
     @ExceptionHandler({PlatformApiDataValidationException.class})
     public ResponseEntity<ApiGlobalErrorResponse> handlePlatformApiDateValidationException(PlatformApiDataValidationException e) {
-     return PlatformApiDataValidationExceptionMapper.toResponse(e);
+     return PlatformApiDataValidationExceptionMapper.sendMessageDataValidationException(e);
     }
 }

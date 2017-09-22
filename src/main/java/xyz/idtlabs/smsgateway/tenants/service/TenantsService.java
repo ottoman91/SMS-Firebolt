@@ -20,6 +20,8 @@ package xyz.idtlabs.smsgateway.tenants.service;
 
 import xyz.idtlabs.smsgateway.service.SecurityService;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
+import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
+import xyz.idtlabs.smsgateway.helpers.ApiParameterError;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException; 
 import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException; 
 import xyz.idtlabs.smsgateway.tenants.exception.InvalidApiKeyException;
@@ -32,6 +34,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import java.util.ArrayList;
+
 
 
 
@@ -42,6 +46,12 @@ public class TenantsService {
 	private final TenantRepository tenantRepository ;
 	
 	private final SecurityService securityService ;
+
+    private String defaultUserMessage;
+
+    private String developerMessage;
+
+    private String errorCode;  
 	
 	@Autowired
 	public TenantsService(final TenantRepository tenantRepository,
@@ -169,14 +179,29 @@ public class TenantsService {
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public void confirmClientCanSendSms(final String apiKey){
+        List<ApiParameterError> error = new ArrayList<>();
         Tenant tenant = this.tenantRepository.findByApiKey(apiKey);
         if(tenant == null){
-            throw new InvalidApiKeyException();
+            defaultUserMessage = "Invalid or missing API Key";
+            developerMessage = "The API key is either incorrect or has not been included in the API call.";
+            errorCode = "invalid_key";
+            ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+                defaultUserMessage,"apiKey",developerMessage);
+            apiParameterError.setValue(apiKey); 
+            error.add(apiParameterError);
+            throw new PlatformApiDataValidationException(error);
         } 
         else{ 
             boolean blockedStatus = tenant.getBlocked();
             if(blockedStatus == true){
-                throw new ClientBlockedException();
+                defaultUserMessage = "Account is not active";
+                developerMessage = "The account is not active.";
+                errorCode = "account_inactive";
+                ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+                defaultUserMessage,"apiKey",developerMessage);
+                apiParameterError.setValue(apiKey); 
+                error.add(apiParameterError);
+                throw new PlatformApiDataValidationException(error);
             }
 
         }

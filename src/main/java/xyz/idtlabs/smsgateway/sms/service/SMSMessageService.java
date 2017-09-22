@@ -88,8 +88,6 @@ public class SMSMessageService {
 
 	private String errorCode;  
 
-	private final List<ApiParameterError> errors = new ArrayList<>();
-
 
 	
 	@Autowired
@@ -240,18 +238,37 @@ public class SMSMessageService {
 			throw new MessageBodyIsEmptyException();
 	}  
 
-	private void checkForMessageSize(final String message){
-		if(message.length() > 160)
-			throw new MessageBodyOverLimit();
+	private void checkForMessageSize(final String message){ 
+		List<ApiParameterError> error = new ArrayList<>();
+		if(message.length() > 160){
+			defaultUserMessage = "Message character over limit";
+			developerMessage = "Message is over 160 chars long.";
+			errorCode = "body_over_limit";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"body",developerMessage);
+			apiParameterError.setValue(message); 
+			error.add(apiParameterError);
+        	throw new PlatformApiDataValidationException(error);
+		}
 	}  
 
 
 	private void checkForEmptyDestination(final String number){
-		if(number.equals(null) || number.equals(""))
-			throw new DestinationIsEmptyException();
+		List<ApiParameterError> error = new ArrayList<>();
+		if(number.equals(null) || number.equals("")){
+			defaultUserMessage = "Empty receivers list";
+			developerMessage = "Destination list is empty.";
+			errorCode = "empty_number_list";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"to",developerMessage);
+			apiParameterError.setValue(number); 
+			error.add(apiParameterError);
+        	throw new PlatformApiDataValidationException(error);
+		}
 	}
 
 	private void checkForDuplicateNumbers(final String numbers){
+		List<ApiParameterError> error = new ArrayList<>();
 		List<String> individualNumbers = Arrays.asList(numbers.split(","));
 		List<String> duplicateNumbers = new ArrayList<String>();
         for (String number : individualNumbers) {
@@ -259,30 +276,34 @@ public class SMSMessageService {
             duplicateNumbers.add(number);
             }
         } 
-        if (duplicateNumbers.size() != 0){
-        	throw new DuplicateDestinationAddressException();
+        if (duplicateNumbers.size() != 0){ 
+        	defaultUserMessage = "Duplicated destination address found";
+			developerMessage = "The destination number you are attempting to send to is duplicated.";
+			errorCode = "duplicate_number";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"to",developerMessage);
+			apiParameterError.setValue(duplicateNumbers); 
+			error.add(apiParameterError);
+        	throw new PlatformApiDataValidationException(error);
         }
 	}  
 
 	private void checkForNumberFormat(final String numbers){
+		List<ApiParameterError> error = new ArrayList<>();
 		List<String> individualNumbers = Arrays.asList(numbers.split(",")); 
-		//String regex = "^\\+(?:[0-9] ?){6,14}[0-9]$";
 		String regex = "^\\+232.*";
 		Pattern pattern = Pattern.compile(regex);
 		for ( String number: individualNumbers){ 
 			Matcher match = pattern.matcher(number);
 			if(!match.find()){
-				//throw new DestinationNumberFormatError(); 
 				defaultUserMessage = "Invalid destination address";
 				developerMessage = "The destination number you are attempting to send to is invalid";
 				errorCode = "invalid_number";
 				ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
-				    defaultUserMessage,developerMessage,"date","date");
-				//apiParameterError.setDeveloperMessage(developerMessage);
-				//apiParameterError.setDefaultUserMessage(defaultUserMessage);
-				//apiParameterError.setUserMessageGlobalisationCode(errorCode); 
-				errors.add(apiParameterError);
-				throw new PlatformApiDataValidationException(errors);
+				    defaultUserMessage,"to",developerMessage);
+				apiParameterError.setValue(number); 
+				error.add(apiParameterError);
+				throw new PlatformApiDataValidationException(error);
 			}
 		}
 	}
