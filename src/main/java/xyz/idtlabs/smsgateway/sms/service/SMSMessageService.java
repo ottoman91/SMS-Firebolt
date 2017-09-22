@@ -32,7 +32,8 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import xyz.idtlabs.smsgateway.service.SecurityService;
-import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
+import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException; 
+import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException; 
 import xyz.idtlabs.smsgateway.helpers.ApiParameterError;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
@@ -234,8 +235,16 @@ public class SMSMessageService {
 	}  
 
 	private void checkForEmptyMessage(final String message){
-		if(message.equals(null) || message.equals(""))
-			throw new MessageBodyIsEmptyException();
+		List<ApiParameterError> error = new ArrayList<>();
+		if(message.equals(null) || message.equals("")){
+            defaultUserMessage = "Empty message content";
+			developerMessage = "Message content is empty.";
+			errorCode = "empty_body";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"body",developerMessage);
+			apiParameterError.setValue(message); 
+			error.add(apiParameterError);
+        	throw new PlatformApiInvalidParameterException(error);		}
 	}  
 
 	private void checkForMessageSize(final String message){ 
@@ -248,7 +257,7 @@ public class SMSMessageService {
 				defaultUserMessage,"body",developerMessage);
 			apiParameterError.setValue(message); 
 			error.add(apiParameterError);
-        	throw new PlatformApiDataValidationException(error);
+        	throw new PlatformApiInvalidParameterException(error);
 		}
 	}  
 
@@ -263,7 +272,7 @@ public class SMSMessageService {
 				defaultUserMessage,"to",developerMessage);
 			apiParameterError.setValue(number); 
 			error.add(apiParameterError);
-        	throw new PlatformApiDataValidationException(error);
+        	throw new PlatformApiInvalidParameterException(error);
 		}
 	}
 

@@ -1,0 +1,17 @@
+<!--
+<?xml version="1.0" encoding="UTF-8"?>-->
+<configuration>
+    
+
+    <!-- Configure the Sentry appender, overriding the logging threshold to the ERROR level -->
+   <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- Enable the Sentry appender -->
+    <root level="ERROR">
+        <appender-ref ref="Sentry" />
+    </root>
+</configuration>

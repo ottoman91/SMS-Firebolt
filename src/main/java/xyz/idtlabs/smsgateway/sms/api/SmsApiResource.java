@@ -23,8 +23,10 @@ import java.util.List;
 
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants; 
 import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
+import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException; 
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.helpers.PlatformApiDataValidationExceptionMapper;
+import xyz.idtlabs.smsgateway.helpers.PlatformApiInvalidParameterExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.PlatformResourceNotFoundExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
@@ -121,5 +123,10 @@ public class SmsApiResource {
     @ExceptionHandler({PlatformApiDataValidationException.class})
     public ResponseEntity<ApiGlobalErrorResponse> handlePlatformApiDateValidationException(PlatformApiDataValidationException e) {
      return PlatformApiDataValidationExceptionMapper.sendMessageDataValidationException(e);
+    } 
+
+    @ExceptionHandler({PlatformApiInvalidParameterException.class})
+    public ResponseEntity<ApiGlobalErrorResponse> handlePlatformApiInvalidParameterException(PlatformApiInvalidParameterException e) {
+     return PlatformApiInvalidParameterExceptionMapper.toResponse(e);
     }
 }

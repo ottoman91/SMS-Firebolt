@@ -203,6 +203,21 @@ public class ApiGlobalErrorResponse {
         globalErrorResponse.setErrors(errors);
 
         return globalErrorResponse;
+    } 
+
+    public static ApiGlobalErrorResponse sendMessageInvalidParameterError(final String globalisationMessageCode, final String defaultUserMessage,
+            final List<ApiParameterError> errors) {
+
+        final ApiGlobalErrorResponse globalErrorResponse = new ApiGlobalErrorResponse();
+        globalErrorResponse.setHttpStatusCode("400");
+        globalErrorResponse
+                .setDeveloperMessage("The request was invalid, due to an invalid parameter entered");
+        globalErrorResponse.setUserMessageGlobalisationCode(globalisationMessageCode);
+        globalErrorResponse.setDefaultUserMessage(defaultUserMessage);
+
+        globalErrorResponse.setErrors(errors);
+
+        return globalErrorResponse;
     }
 
 
