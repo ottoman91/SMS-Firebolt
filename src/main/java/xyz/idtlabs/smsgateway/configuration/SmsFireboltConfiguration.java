@@ -16,18 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway;
+package xyz.idtlabs.smsgateway.configuration; 
 
-import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
-import org.springframework.boot.SpringApplication;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
-public class MessageGateway {
+@Configuration
+@Import({ MessageGatewayConfiguration.class, SpringConfiguringClass.class })
+public class SmsFireboltConfiguration {
 
-    public MessageGateway() {
-        super();
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(SmsFireboltConfiguration.class, args);
-    }
 }

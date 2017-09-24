@@ -46,7 +46,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils; 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.Gauge;
+import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.Timed;
+import com.ryantenney.metrics.annotation.Counted;
+
+
 
 
 @RestController
@@ -66,7 +74,9 @@ public class SmsApiResource {
     } 
 
    // -------------------Send Message via HTTP GET Request--------------------------------------------------------
-    
+    @Metered(name = "HTTP Send Message Meter", absolute=true)
+    @Counted(name = "httpSendCount",monotonic=true)
+    @ExceptionMetered(name = "HTTP Send Exception Meter", absolute = true)
     @RequestMapping(value="/http/send",params = {"apiKey", "to","body"},method = RequestMethod.GET) 
     public ResponseEntity<?> sendMessageViaHttp(
       @RequestParam(value="apiKey") String apiKey,  @RequestParam(value="to") String to,
@@ -86,7 +96,9 @@ public class SmsApiResource {
 
 
       //-------------------Send Message via REST POST Request--------------------------------------------------------
-    
+    @Metered(name = "REST Send Message Meter", absolute=true)
+    @Counted(name = "restSendCount",monotonic=true)
+    @ExceptionMetered(name = "REST Send Exception Meter", absolute = true)
     @RequestMapping(method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"}) 
     public ResponseEntity<?> sendMessageViaRest(
         @RequestHeader(MessageGatewayConstants.TENANT_APPKEY_HEADER) 
