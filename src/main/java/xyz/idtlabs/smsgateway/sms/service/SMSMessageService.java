@@ -48,9 +48,12 @@ import xyz.idtlabs.smsgateway.sms.exception.MessageBodyOverLimit;
 import xyz.idtlabs.smsgateway.sms.exception.DestinationIsEmptyException; 
 import xyz.idtlabs.smsgateway.sms.exception.DestinationNumberFormatError;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource; 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,7 +66,14 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections; 
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.regex.Matcher; 
+import java.io.IOException;
+import java.io.StringWriter;
+
+
+
+
+
 
 
 @Service
@@ -87,7 +97,12 @@ public class SMSMessageService {
 
 	private String developerMessage;
 
-	private String errorCode;  
+	private String errorCode;    
+
+	@Value("classpath:mno.properties")
+    private Resource validMobileCodes; 
+
+
 
 
 	
@@ -315,6 +330,45 @@ public class SMSMessageService {
 				throw new PlatformApiDataValidationException(error);
 			}
 		}
+	} 
+
+	private void checkForMobileNetworkOperator(final String numbers){
+		List<ApiParameterError> error = new ArrayList<>();
+		List<String> individualNumbers = Arrays.asList(numbers.split(","));
+		String validNetworkOperators = "";  
+		StringWriter writer = new StringWriter();
+
+		try{ 
+			IOUtils.copy(validMobileCodes.getInputStream(), writer, "UTF-8");
+			validNetworkOperators = writer.toString();
+            
+        }catch(IOException e){
+            logger.error("Input error",e.toString());
+        }    
+        List<String> networkCodes = Arrays.asList(validNetworkOperators.split(","));
+
+        for(String number: individualNumbers){
+        	boolean validCode = false; 
+        	for(String networkCode: networkCodes){
+        		Pattern pattern = Pattern.compile("^\\+232" + networkCode + ".*"); 
+        		Matcher match = pattern.matcher(number);
+        		if(match.find()){
+        			validCode = true;
+        		}
+        	} 
+        	if(validCode == false){ 
+
+        		defaultUserMessage = "MNO not supported";
+        		developerMessage = "Mobile company is not supported";
+        		errorCode = "mno_invalid"; 
+        		ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+        			defaultUserMessage,"to",developerMessage);
+        		apiParameterError.setValue(number);
+        		error.add(apiParameterError);
+        		throw new PlatformApiDataValidationException(error);
+
+        	}
+        }       
 	}
 	
 
@@ -325,6 +379,7 @@ public class SMSMessageService {
 		checkForEmptyDestination(number);
 		checkForDuplicateNumbers(number);
 		checkForNumberFormat(number);
+	    checkForMobileNetworkOperator(number);
 
 	}
 
