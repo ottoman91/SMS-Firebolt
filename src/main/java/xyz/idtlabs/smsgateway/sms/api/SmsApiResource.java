@@ -74,9 +74,9 @@ public class SmsApiResource {
     } 
 
    // -------------------Send Message via HTTP GET Request--------------------------------------------------------
-    @Metered(name = "HTTP Send Message Meter", absolute=true)
+    @Metered(name = "meter.sendsms.http", absolute=true)
     @Counted(name = "httpSendCount",monotonic=true)
-    @ExceptionMetered(name = "HTTP Send Exception Meter", absolute = true)
+    @ExceptionMetered(name = "exception.metered.sendsms.http", absolute = true)
     @RequestMapping(value="/http/send",params = {"apiKey", "to","body"},method = RequestMethod.GET) 
     public ResponseEntity<?> sendMessageViaHttp(
       @RequestParam(value="apiKey") String apiKey,  @RequestParam(value="to") String to,
@@ -95,10 +95,10 @@ public class SmsApiResource {
   
 
 
-      //-------------------Send Message via REST POST Request--------------------------------------------------------
-    @Metered(name = "REST Send Message Meter", absolute=true)
-    @Counted(name = "restSendCount",monotonic=true)
-    @ExceptionMetered(name = "REST Send Exception Meter", absolute = true)
+      //-------------------Send Message via JSON Object in a  POST Request--------------------------------------------------------
+    @Metered(name = "meter.sendsms.json", absolute=true)
+    @Counted(name = "jsonSendCount",monotonic=true)
+    @ExceptionMetered(name = "exception.metered.sendsms.json", absolute = true)
     @RequestMapping(method = RequestMethod.POST,consumes = {"application/json"}, produces = {"application/json"}) 
     public ResponseEntity<?> sendMessageViaRest(
         @RequestHeader(MessageGatewayConstants.TENANT_APPKEY_HEADER) 
