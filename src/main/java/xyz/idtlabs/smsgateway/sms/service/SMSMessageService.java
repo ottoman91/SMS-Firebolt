@@ -69,9 +69,12 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher; 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Locale;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber; 
+import com.google.i18n.phonenumbers.PhoneNumberToCarrierMapper;
+
 
 
 @Service
@@ -97,8 +100,6 @@ public class SMSMessageService {
 
 	private String errorCode;    
 
-	@Value("classpath:mno.properties")
-    private Resource validMobileCodes;  
 
     @Value("classpath:countrycodes.properties")
     private Resource countryCodes;  
@@ -314,64 +315,7 @@ public class SMSMessageService {
         }
 	}  
 
-	private void checkForNumberFormat(final String numbers){
-		List<ApiParameterError> error = new ArrayList<>();
-		List<String> individualNumbers = Arrays.asList(numbers.split(","));
-		String regex = "^\\+232.*";
-		Pattern pattern = Pattern.compile(regex);
-		for ( String number: individualNumbers){
-			Matcher match = pattern.matcher(number);
-			if(!match.find()){
-				defaultUserMessage = "Invalid destination address";
-				developerMessage = "The destination number you are attempting to send to is invalid";
-				errorCode = "invalid_number";
-				ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
-				    defaultUserMessage,"to",developerMessage);
-				apiParameterError.setValue(number);
-				error.add(apiParameterError);
-				throw new PlatformApiDataValidationException(error);
-			}
-		}
-	}
-
-	private void checkForMobileNetworkOperator(final String numbers){
-		List<ApiParameterError> error = new ArrayList<>();
-		List<String> individualNumbers = Arrays.asList(numbers.split(","));
-		String validNetworkOperators = "";  
-		StringWriter writer = new StringWriter();
-
-		try{ 
-			IOUtils.copy(validMobileCodes.getInputStream(), writer, "UTF-8");
-			validNetworkOperators = writer.toString();
-            
-        }catch(IOException e){
-            logger.error("Input error",e.toString());
-        }    
-        List<String> networkCodes = Arrays.asList(validNetworkOperators.split(","));
-
-        for(String number: individualNumbers){
-        	boolean validCode = false; 
-        	for(String networkCode: networkCodes){
-        		Pattern pattern = Pattern.compile("^\\+232" + networkCode + ".*"); 
-        		Matcher match = pattern.matcher(number);
-        		if(match.find()){
-        			validCode = true;
-        		}
-        	} 
-        	if(validCode == false){ 
-
-        		defaultUserMessage = "MNO not supported";
-        		developerMessage = "Mobile company is not supported";
-        		errorCode = "mno_invalid"; 
-        		ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
-        			defaultUserMessage,"to",developerMessage);
-        		apiParameterError.setValue(number);
-        		error.add(apiParameterError);
-        		throw new PlatformApiDataValidationException(error);
-
-        	}
-        }       
-	}  
+	
 
 
 	private void validateNumber(final String numbers){
@@ -379,8 +323,6 @@ public class SMSMessageService {
 		List<String> individualNumbers = Arrays.asList(numbers.split(","));
 		String validCountryCodes = "";
 		StringWriter writer = new StringWriter();   
-		//boolean validNumber = false;
-		//PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 
 		try{
 			IOUtils.copy(countryCodes.getInputStream(),writer,"UTF-8");
@@ -391,10 +333,13 @@ public class SMSMessageService {
 		List<String> codes = Arrays.asList(validCountryCodes.split(","));
 		for(String number: individualNumbers){ 
 			boolean validNumber = false;
-			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance(); 
+			PhoneNumber clientNumber = new PhoneNumber();
+			PhoneNumberToCarrierMapper phoneToCarrier = PhoneNumberToCarrierMapper.getInstance();
+			String carrierName = "";
 			for(String code:codes){ 
 				try{ 
-					PhoneNumber clientNumber = phoneUtil.parse(number,code);
+					clientNumber = phoneUtil.parse(number,code);
 					if(phoneUtil.isValidNumber(clientNumber)){
 						validNumber = true;	
 					}
@@ -412,44 +357,21 @@ public class SMSMessageService {
 				error.add(apiParameterError);
 				throw new PlatformApiDataValidationException(error);
 			} 
+			carrierName = phoneToCarrier.getNameForNumber(clientNumber,Locale.ENGLISH);
+			if(carrierName == ""){
+				defaultUserMessage = "MNO Not supported";
+				developerMessage = "Mobile company is not supported";
+				errorCode = "mno_invalid";
+				ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				    defaultUserMessage,"to",developerMessage);
+				apiParameterError.setValue(number);
+				error.add(apiParameterError);
+				throw new PlatformApiDataValidationException(error);
+			}  
 		} 
 	}
 
-	// private void validateNumber(final String numbers){
-	// 	List<ApiParameterError> error = new ArrayList<>();
-	// 	List<String> individualNumbers = Arrays.asList(numbers.split(","));
-	// 	String validCountryCodes = "";
-	// 	StringWriter writer = new StringWriter(); 
-	// 	try{ 
-	// 		IOUtils.copy(countryCodes.getInputStream(), writer, "UTF-8");
-	// 		validCountryCodes = writer.toString();
-            
- //        }catch(IOException n){
- //            logger.error("Number parsor error",n.toString());
- //        }    
- //        List<String> codes = Arrays.asList(validCountryCodes.split(","));
-	// 	for ( String number: individualNumbers){  
-	// 		for (String code : codes){ 
 
-	// 			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-	// 		    try{
-	// 			    PhoneNumber clientNumber = phoneUtil.parse(number, code);
-	// 		        if(!phoneUtil.isValidNumberForRegion(clientNumber,code)){
-				        // defaultUserMessage="Invalid destination address";
-				        // developerMessage = "The destination number you are attempting to send to is invalid";
-				        // errorCode = "invalid_number";
-				        // ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
-				        //     defaultUserMessage,"to",developerMessage);
-				        // apiParameterError.setValue(number);
-				        // error.add(apiParameterError);
-				        // throw new PlatformApiDataValidationException(error);
-	// 		        }
-	// 		    }catch (NumberParseException e){
-	// 			    logger.error("Number parser error occured");
-	// 		    } 
- //            }	
-	// 	}
-	// }
 	
 
 
@@ -460,8 +382,6 @@ public class SMSMessageService {
 		checkForEmptyDestination(number);
 		checkForDuplicateNumbers(number); 
 		validateNumber(number);
-		//checkForNumberFormat(number);
-	    //checkForMobileNetworkOperator(number);
 
 	}
 
