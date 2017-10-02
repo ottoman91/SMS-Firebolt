@@ -25,22 +25,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Exception thrown when problem with an API request to the platform.
+ * Exception thrown when a HTTP 400 Error is thrown from an API request 
  */
-@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR, reason="PlatformApiDataValidationException")
-public class PlatformApiDataValidationException extends RuntimeException {
+@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="PlatformApiInvalidParameterException")
+public class PlatformApiInvalidParameterException extends RuntimeException {
 
     private final String globalisationMessageCode;
     private final String defaultUserMessage;
     private final List<ApiParameterError> errors;
 
-    public PlatformApiDataValidationException(final List<ApiParameterError> errors) {
+    public PlatformApiInvalidParameterException(final List<ApiParameterError> errors) {
         this.globalisationMessageCode = "validation.msg.validation.errors.exist";
         this.defaultUserMessage = "Validation errors exist.";
         this.errors = errors;
     }
 
-    public PlatformApiDataValidationException(final String globalisationMessageCode, final String defaultUserMessage,
+    public PlatformApiInvalidParameterException(final String globalisationMessageCode, final String defaultUserMessage,
             final List<ApiParameterError> errors) {
         this.globalisationMessageCode = globalisationMessageCode;
         this.defaultUserMessage = defaultUserMessage;

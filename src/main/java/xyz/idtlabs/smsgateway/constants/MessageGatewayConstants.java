@@ -22,7 +22,7 @@ public interface MessageGatewayConstants {
 
 	String TENANT_IDENTIFIER_HEADER = "Fineract-Platform-TenantId";
 	
-	String TENANT_APPKEY_HEADER =  "Fineract-Tenant-App-Key" ;
+	String TENANT_APPKEY_HEADER =  "SMS-Firebolt-Api-Key";
 	
 	
 	String PROVIDER_ACCOUNT_ID = "Provider_Account_Id" ;

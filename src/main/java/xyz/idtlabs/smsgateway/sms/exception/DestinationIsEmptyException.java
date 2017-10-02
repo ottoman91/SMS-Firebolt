@@ -18,6 +18,10 @@
  */
 package xyz.idtlabs.smsgateway.sms.exception;
 
-public class ProviderNotDefinedException extends RuntimeException{
+public class DestinationIsEmptyException extends RuntimeException{ 
+
+    public DestinationIsEmptyException() {
+        super() ;
+    }
 
 }

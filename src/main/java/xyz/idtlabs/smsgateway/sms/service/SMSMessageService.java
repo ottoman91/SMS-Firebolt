@@ -32,6 +32,9 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import xyz.idtlabs.smsgateway.service.SecurityService;
+import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException; 
+import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException; 
+import xyz.idtlabs.smsgateway.helpers.ApiParameterError;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.providers.SMSProviderFactory;
@@ -39,10 +42,18 @@ import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
 import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType; 
 import xyz.idtlabs.smsgateway.sms.exception.SmsMessagesNotFoundException;
 import xyz.idtlabs.smsgateway.sms.exception.SmsMessageNotFoundException;
+import xyz.idtlabs.smsgateway.sms.exception.DuplicateDestinationAddressException;
+import xyz.idtlabs.smsgateway.sms.exception.MessageBodyIsEmptyException;
+import xyz.idtlabs.smsgateway.sms.exception.MessageBodyOverLimit;
+import xyz.idtlabs.smsgateway.sms.exception.DestinationIsEmptyException; 
+import xyz.idtlabs.smsgateway.sms.exception.DestinationNumberFormatError;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource; 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +62,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service; 
 import java.util.List; 
 import java.util.Date;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections; 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher; 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Locale;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber; 
+import com.google.i18n.phonenumbers.PhoneNumberToCarrierMapper;
 
 
 
@@ -69,8 +92,22 @@ public class SMSMessageService {
 	
 	private ScheduledExecutorService scheduledExecutorService ;
 	
-	private final SecurityService securityService ;
-	
+	private final SecurityService securityService ;  
+
+	private String defaultUserMessage;
+
+	private String developerMessage;
+
+	private String errorCode;    
+
+
+    @Value("classpath:countrycodes.properties")
+    private Resource countryCodes;  
+
+
+
+
+
 	
 	@Autowired
 	public SMSMessageService(final SmsOutboundMessageRepository smsOutboundMessageRepository,
@@ -187,7 +224,15 @@ public class SMSMessageService {
 			}while (page < totalPageSize);
 			return totalPageSize;
 		}
-	} 
+	}  
+
+	public void sendSMS(final String apiKey, final String to, final String body){
+		Tenant tenant = this.securityService.authenticate(apiKey) ;  
+		long tenantId = tenant.getId(); 
+		Date currentDate = new Date();
+		SMSMessage smsMessage = new SMSMessage(tenantId,to,currentDate,body);
+		this.smsOutboundMessageRepository.save(smsMessage);
+	}
 
 	public Page<SMSMessage> findMessagesByTenantId(final Long tenantId, final int page, final int size ){
 		Page<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findAllByTenantId(tenantId, new PageRequest(page, size));
@@ -205,6 +250,139 @@ public class SMSMessageService {
 		List<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findByDatesAndId(tenantId,dateFrom,dateTo);
 		return smsMessages.size();
 		
+	}  
+
+	private void checkForEmptyMessage(final String message){
+		List<ApiParameterError> error = new ArrayList<>();
+		if(message.equals(null) || message.equals("")){
+            defaultUserMessage = "Empty message content";
+			developerMessage = "Message content is empty.";
+			errorCode = "empty_body";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"body",developerMessage);
+			apiParameterError.setValue(message); 
+			error.add(apiParameterError);
+        	throw new PlatformApiInvalidParameterException(error);		}
+	}  
+
+	private void checkForMessageSize(final String message){ 
+		List<ApiParameterError> error = new ArrayList<>();
+		if(message.length() > 160){
+			defaultUserMessage = "Message character over limit";
+			developerMessage = "Message is over 160 chars long.";
+			errorCode = "body_over_limit";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"body",developerMessage);
+			apiParameterError.setValue(message); 
+			error.add(apiParameterError);
+        	throw new PlatformApiInvalidParameterException(error);
+		}
+	}  
+
+
+	private void checkForEmptyDestination(final String number){
+		List<ApiParameterError> error = new ArrayList<>();
+		if(number.equals(null) || number.equals("")){
+			defaultUserMessage = "Empty receivers list";
+			developerMessage = "Destination list is empty.";
+			errorCode = "empty_number_list";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"to",developerMessage);
+			apiParameterError.setValue(number); 
+			error.add(apiParameterError);
+        	throw new PlatformApiInvalidParameterException(error);
+		}
+	}
+
+	private void checkForDuplicateNumbers(final String numbers){
+		List<ApiParameterError> error = new ArrayList<>();
+		List<String> individualNumbers = Arrays.asList(numbers.split(","));
+		List<String> duplicateNumbers = new ArrayList<String>();
+        for (String number : individualNumbers) {
+            if(Collections.frequency(individualNumbers, number) > 1) {
+            duplicateNumbers.add(number);
+            }
+        } 
+        if (duplicateNumbers.size() != 0){ 
+        	defaultUserMessage = "Duplicated destination address found";
+			developerMessage = "The destination number you are attempting to send to is duplicated.";
+			errorCode = "duplicate_number";
+			ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				defaultUserMessage,"to",developerMessage);
+			apiParameterError.setValue(duplicateNumbers); 
+			error.add(apiParameterError);
+        	throw new PlatformApiDataValidationException(error);
+        }
+	}  
+
+	
+
+
+	private void validateNumber(final String numbers){
+		List<ApiParameterError> error = new ArrayList<>();
+		List<String> individualNumbers = Arrays.asList(numbers.split(","));
+		String validCountryCodes = "";
+		StringWriter writer = new StringWriter();   
+
+		try{
+			IOUtils.copy(countryCodes.getInputStream(),writer,"UTF-8");
+			validCountryCodes = writer.toString();
+		}catch(IOException e){
+			logger.error("Country Code reading error",e.toString());
+		} 
+		List<String> codes = Arrays.asList(validCountryCodes.split(","));
+		for(String number: individualNumbers){ 
+			boolean validNumber = false;
+			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance(); 
+			PhoneNumber clientNumber = new PhoneNumber();
+			PhoneNumberToCarrierMapper phoneToCarrier = PhoneNumberToCarrierMapper.getInstance();
+			String carrierName = "";
+			for(String code:codes){ 
+				try{ 
+					clientNumber = phoneUtil.parse(number,code);
+					if(phoneUtil.isValidNumber(clientNumber)){
+						validNumber = true;	
+					}
+				}catch (NumberParseException n){
+					logger.error("Number parsing error",n.toString());
+				}  
+			} 
+			if(!validNumber){ 
+				defaultUserMessage="Invalid destination address";
+				developerMessage = "The destination number you are attempting to send to is invalid";
+				errorCode = "invalid_number";
+				ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				    defaultUserMessage,"to",developerMessage);
+				apiParameterError.setValue(number);
+				error.add(apiParameterError);
+				throw new PlatformApiDataValidationException(error);
+			} 
+			carrierName = phoneToCarrier.getNameForNumber(clientNumber,Locale.ENGLISH);
+			if(carrierName == ""){
+				defaultUserMessage = "MNO Not supported";
+				developerMessage = "Mobile company is not supported";
+				errorCode = "mno_invalid";
+				ApiParameterError apiParameterError = ApiParameterError.parameterError(errorCode,
+				    defaultUserMessage,"to",developerMessage);
+				apiParameterError.setValue(number);
+				error.add(apiParameterError);
+				throw new PlatformApiDataValidationException(error);
+			}  
+		} 
+	}
+
+
+	
+
+
+	public void validateMessageAndDestination(final String number, final String message){
+
+		checkForEmptyMessage(message);
+		checkForMessageSize(message);
+		checkForEmptyDestination(number);
+		checkForDuplicateNumbers(number); 
+		validateNumber(number);
+
 	}
 
 

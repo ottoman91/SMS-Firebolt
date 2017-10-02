@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;   
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.validation.annotation.Validated; 
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat; 
 import org.springframework.data.domain.Page;  
 import org.springframework.data.domain.Pageable;
 import java.util.List; 
@@ -45,6 +45,10 @@ import java.text.DateFormat;
 import java.util.List; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.logging.*;
+//import java.util.logging.Level;
+
+
 
 
 @RestController
@@ -77,15 +81,15 @@ public class TenantsApiResource {
     } 
 
         //-------------------Retrieve a Single Client --------------------------------------------------------
-    
     @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public ResponseEntity<Tenant> getClient(@PathVariable("id") long id) {
         logger.info("Fetching Client with Id " + id);
         Tenant tenant = tenantService.findTenantById(id);
         if (tenant == null) {
-            logger.debug("Tenant with id " + id + " not found");
+            //logger.debug("Tenant with id " + id + " not found");
+            logger.error("test");
             return new ResponseEntity<Tenant>(HttpStatus.NOT_FOUND);
-        }
+        }  
         return new ResponseEntity<Tenant>(tenant, HttpStatus.OK);
     } 
 
@@ -105,7 +109,6 @@ public class TenantsApiResource {
   
 
         //------------------- Delete a Client --------------------------------------------------------
-    
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     public ResponseEntity<Tenant> deleteClient(@PathVariable("id") long id) {
         logger.info("Fetching & Deleting Client with id " + id);
@@ -201,7 +204,6 @@ public class TenantsApiResource {
 
 
      //------------------- Retrieve All Messages Sent by a Client --------------------------------------------------------
-    
     @RequestMapping(value = "/{id}/messages",params = {"page", "size"},method = RequestMethod.GET,consumes = {"application/json"})
     public Page<SMSMessage> listMessages(@PathVariable("id") long id,
             @RequestParam("page") int page, @RequestParam("size") int size) {

@@ -31,6 +31,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.servlet.HandlerExceptionResolver; 
+
 
 @Configuration
 @EnableAutoConfiguration
@@ -60,5 +62,11 @@ public class MessageGatewayConfiguration {
         final SimpleApplicationEventMulticaster multicaster = new SimpleApplicationEventMulticaster();
         multicaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
         return multicaster;
-    }
+    } 
+    @Bean
+    public HandlerExceptionResolver sentryExceptionResolver() {
+        return new io.sentry.spring.SentryExceptionResolver();
+    } 
+
+
 }

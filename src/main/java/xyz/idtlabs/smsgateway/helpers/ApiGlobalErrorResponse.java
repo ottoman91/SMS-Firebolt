@@ -188,7 +188,38 @@ public class ApiGlobalErrorResponse {
         globalErrorResponse.setErrors(errors);
 
         return globalErrorResponse;
+    }  
+
+    public static ApiGlobalErrorResponse sendMessageDataValidationError(final String globalisationMessageCode, final String defaultUserMessage,
+            final List<ApiParameterError> errors) {
+
+        final ApiGlobalErrorResponse globalErrorResponse = new ApiGlobalErrorResponse();
+        globalErrorResponse.setHttpStatusCode("500");
+        globalErrorResponse
+                .setDeveloperMessage("The request was invalid, due to erroneous data entered in the send message API Calls.");
+        globalErrorResponse.setUserMessageGlobalisationCode(globalisationMessageCode);
+        globalErrorResponse.setDefaultUserMessage(defaultUserMessage);
+
+        globalErrorResponse.setErrors(errors);
+
+        return globalErrorResponse;
+    } 
+
+    public static ApiGlobalErrorResponse sendMessageInvalidParameterError(final String globalisationMessageCode, final String defaultUserMessage,
+            final List<ApiParameterError> errors) {
+
+        final ApiGlobalErrorResponse globalErrorResponse = new ApiGlobalErrorResponse();
+        globalErrorResponse.setHttpStatusCode("400");
+        globalErrorResponse
+                .setDeveloperMessage("The request was invalid, due to an invalid parameter entered");
+        globalErrorResponse.setUserMessageGlobalisationCode(globalisationMessageCode);
+        globalErrorResponse.setDefaultUserMessage(defaultUserMessage);
+
+        globalErrorResponse.setErrors(errors);
+
+        return globalErrorResponse;
     }
+
 
     protected ApiGlobalErrorResponse() {
         //

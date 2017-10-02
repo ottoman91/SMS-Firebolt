@@ -18,6 +18,10 @@
  */
 package xyz.idtlabs.smsgateway.sms.exception;
 
-public class ProviderNotDefinedException extends RuntimeException{
+public class DestinationNumberFormatError extends RuntimeException{ 
+
+    public DestinationNumberFormatError() {
+        super() ;
+    }
 
 }

@@ -18,7 +18,7 @@
  */
 package xyz.idtlabs.smsgateway;
 
-import xyz.idtlabs.smsgateway.configuration.MessageGatewayConfiguration;
+import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
 import org.springframework.boot.SpringApplication;
 
 public class MessageGateway {
@@ -28,6 +28,6 @@ public class MessageGateway {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(MessageGatewayConfiguration.class, args);
+        SpringApplication.run(SmsFireboltConfiguration.class, args);
     }
 }

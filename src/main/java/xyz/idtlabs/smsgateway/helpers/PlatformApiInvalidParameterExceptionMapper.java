@@ -18,31 +18,25 @@
  */
 package xyz.idtlabs.smsgateway.helpers;
 
-import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
+import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * The {@link PlatformApiDataValidationException} is typically thrown in data
+ * The {@link PlatformApiInvalidParameterException} is typically thrown in data
  * validation of the parameters passed in with an api request.
  */
 @Component
 @Scope("singleton")
-public class PlatformApiDataValidationExceptionMapper {
+public class PlatformApiInvalidParameterExceptionMapper {
 
-    public static ResponseEntity<ApiGlobalErrorResponse> toResponse(final PlatformApiDataValidationException exception) {
-        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.badClientRequest(
+    public static ResponseEntity<ApiGlobalErrorResponse> toResponse(final PlatformApiInvalidParameterException exception) {
+        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.sendMessageInvalidParameterError(
                 exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
-        return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR) ;
+        return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.BAD_REQUEST) ;
     }   
-
-    public static ResponseEntity<ApiGlobalErrorResponse> sendMessageDataValidationException(final PlatformApiDataValidationException exception) {
-        final ApiGlobalErrorResponse dataValidationErrorResponse = ApiGlobalErrorResponse.sendMessageDataValidationError(
-                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getErrors());
-        return new ResponseEntity<>(dataValidationErrorResponse, HttpStatus.INTERNAL_SERVER_ERROR) ;
-    }  
 
   
 

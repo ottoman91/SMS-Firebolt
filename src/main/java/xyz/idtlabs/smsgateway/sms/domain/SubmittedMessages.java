@@ -16,8 +16,55 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.sms.exception;
+package xyz.idtlabs.smsgateway.sms.domain;
 
-public class ProviderNotDefinedException extends RuntimeException{
+import java.util.Date;
+import java.text.DateFormat; 
 
+
+
+
+
+public class SubmittedMessages {
+
+    private String id;  
+
+    private boolean accepted;
+
+    private String to;  
+
+
+  
+
+    
+
+    public void setId(final String id){
+        this.id = id;
+    } 
+
+    public String getId(){
+        return id;
+    } 
+
+    public void setAccepted(){
+        this.accepted = true;
+    }
+    
+    public boolean getAccepted(){
+        return accepted;
+    }
+
+    
+    public void setTo(final String to) {
+        this.to = to ;
+    }
+    
+    public String getTo() {
+        return to ;
+    } 
+
+  
+
+
+   
 }

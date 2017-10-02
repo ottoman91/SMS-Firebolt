@@ -16,8 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.sms.exception;
+package xyz.idtlabs.smsgateway.sms.domain;
 
-public class ProviderNotDefinedException extends RuntimeException{
+import java.util.Date;
+import java.text.DateFormat; 
+import java.util.ArrayList;
+import java.util.List; 
 
+
+
+
+
+public class SendRestSMS {
+
+    private String body;  
+
+    private List<String> to; 
+
+    SendRestSMS(){
+        this.to = new ArrayList<>();
+    }
+
+
+  
+
+    
+
+    public void setBody(final String body){
+        this.body = body;
+    } 
+
+    public String getBody(){
+        return body;
+    } 
+
+    public void setTo(final List<String> to){
+        this.to = (to == null) ? new ArrayList<>() : new ArrayList<>(to);
+    }
+    
+    public List<String> getTo(){
+        return new ArrayList(to);
+    }
+
+    
+    
+
+  
+
+
+   
 }

@@ -16,8 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.sms.exception;
+package xyz.idtlabs.smsgateway.configuration; 
 
-public class ProviderNotDefinedException extends RuntimeException{
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+@Configuration
+@Import({ MessageGatewayConfiguration.class, SpringConfiguringClass.class })
+public class SmsFireboltConfiguration {
 
 }

@@ -16,8 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.sms.exception;
+package xyz.idtlabs.smsgateway.tenants.exception;
 
-public class ProviderNotDefinedException extends RuntimeException{
+public class InvalidApiKeyException extends RuntimeException{
 
+    public InvalidApiKeyException() {
+        super() ;
+    }
 }
