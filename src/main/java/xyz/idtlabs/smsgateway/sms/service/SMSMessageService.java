@@ -98,26 +98,22 @@ public class SMSMessageService {
 
 	private String developerMessage;
 
-	private String errorCode;    
+	private String errorCode;   
 
-
-    @Value("classpath:countrycodes.properties")
-    private Resource countryCodes;  
-
-
-
-
-
-	
+	private String countryCodes;
+ 	
 	@Autowired
 	public SMSMessageService(final SmsOutboundMessageRepository smsOutboundMessageRepository,
 			final SMSProviderFactory smsProviderFactory,
 			final DataSource dataSource,
-			final SecurityService securityService) {
+			final SecurityService securityService,
+			@Value("${country.codes}")
+            String countryCodes) {
 		this.smsOutboundMessageRepository = smsOutboundMessageRepository ;
 		this.smsProviderFactory = smsProviderFactory ;
 		this.jdbcTemplate = new JdbcTemplate(dataSource) ;
 		this.securityService = securityService ;
+		this.countryCodes = countryCodes;
 	}
 	
 	@PostConstruct
@@ -226,7 +222,7 @@ public class SMSMessageService {
 		}
 	}  
 
-	public void sendSMS(final String apiKey, final String to, final String body){
+	public void saveSMS(final String apiKey, final String to, final String body){
 		Tenant tenant = this.securityService.authenticate(apiKey) ;  
 		long tenantId = tenant.getId(); 
 		Date currentDate = new Date();
@@ -321,16 +317,8 @@ public class SMSMessageService {
 	private void validateNumber(final String numbers){
 		List<ApiParameterError> error = new ArrayList<>();
 		List<String> individualNumbers = Arrays.asList(numbers.split(","));
-		String validCountryCodes = "";
-		StringWriter writer = new StringWriter();   
-
-		try{
-			IOUtils.copy(countryCodes.getInputStream(),writer,"UTF-8");
-			validCountryCodes = writer.toString();
-		}catch(IOException e){
-			logger.error("Country Code reading error",e.toString());
-		} 
-		List<String> codes = Arrays.asList(validCountryCodes.split(","));
+		
+		List<String> codes = Arrays.asList(countryCodes.split(","));
 		for(String number: individualNumbers){ 
 			boolean validNumber = false;
 			PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance(); 

@@ -63,6 +63,7 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile 'com.ryantenney.metrics:metrics-spring:3.1.3'
     compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 
     

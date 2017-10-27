@@ -25,13 +25,15 @@ import java.text.DateFormat;
 
 
 
-public class SubmittedMessages {
+public class Message {
 
     private String id;  
 
     private boolean accepted;
 
-    private String to;  
+    private String to;   
+
+    private String body;
 
 
   
@@ -61,10 +63,13 @@ public class SubmittedMessages {
     
     public String getTo() {
         return to ;
+    }  
+
+    public void setBody(final String body) {
+        this.body = body ;
+    }
+    
+    public String getBody() {
+        return body ;
     } 
-
-  
-
-
-   
 }

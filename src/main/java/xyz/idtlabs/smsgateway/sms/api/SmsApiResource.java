@@ -20,6 +20,7 @@ package xyz.idtlabs.smsgateway.sms.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Arrays;
 
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants; 
 import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
@@ -30,9 +31,10 @@ import xyz.idtlabs.smsgateway.helpers.PlatformApiInvalidParameterExceptionMapper
 import xyz.idtlabs.smsgateway.helpers.PlatformResourceNotFoundExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
-import xyz.idtlabs.smsgateway.sms.domain.SubmittedMessages;
+import xyz.idtlabs.smsgateway.sms.domain.Message;
 import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService; 
+import xyz.idtlabs.smsgateway.sms.service.SmsDeliver; 
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,7 +73,10 @@ public class SmsApiResource {
     public SmsApiResource(final SMSMessageService smsMessageService, final TenantsService tenantService) {
 		this.smsMessageService = smsMessageService ; 
         this.tenantService = tenantService;
-    } 
+    }  
+
+    @Autowired
+    SmsDeliver smsDeliver; 
 
    // -------------------Send Message via HTTP GET Request--------------------------------------------------------
     @Metered(name = "meter.sendsms.http", absolute=true)
@@ -83,13 +88,17 @@ public class SmsApiResource {
                     @RequestParam(value="body",required=true) String body) {
         tenantService.confirmClientCanSendSms(apiKey);  
         smsMessageService.validateMessageAndDestination(to,body); 
-        smsMessageService.sendSMS(apiKey,to,body);
-        SubmittedMessages submittedMessages = new SubmittedMessages();
-        submittedMessages.setTo(to);
-        submittedMessages.setId(apiKey); 
-        submittedMessages.setAccepted();
- 
-        return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
+        Message message = new Message();
+        message.setTo(to);
+        message.setId(apiKey); 
+        message.setAccepted();  
+        message.setBody(body); 
+        List<String> individualNumbers = Arrays.asList(to.split(","));
+        for (String number : individualNumbers) { 
+            smsDeliver.send(body,number); 
+            smsMessageService.saveSMS(apiKey,number,body);
+        }
+        return new ResponseEntity<Message>(message,HttpStatus.OK);
     }  
 
   
@@ -108,12 +117,17 @@ public class SmsApiResource {
         String body = smsMessage.getBody();
         tenantService.confirmClientCanSendSms(apiKey);
         smsMessageService.validateMessageAndDestination(numbers,body); 
-        smsMessageService.sendSMS(apiKey,numbers,body);
-        SubmittedMessages submittedMessages = new SubmittedMessages();
-        submittedMessages.setTo(numbers);
-        submittedMessages.setId(apiKey);
-        submittedMessages.setAccepted();
-        return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
+        Message message = new Message();
+        message.setTo(numbers);
+        message.setId(apiKey);
+        message.setAccepted();
+        message.setBody(body);
+        List<String> individualNumbers = Arrays.asList(numbers.split(","));
+        for (String number : individualNumbers) { 
+            smsDeliver.send(body,number); 
+            smsMessageService.saveSMS(apiKey,number,body);
+        }
+        return new ResponseEntity<Message>(message,HttpStatus.OK);
     }
 
     // @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
