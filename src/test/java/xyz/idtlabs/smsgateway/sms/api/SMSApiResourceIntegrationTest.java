@@ -16,32 +16,88 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// package xyz.idtlabs.smsgateway.sms.api; 
-
-
-// import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-// import static com.github.tomakehurst.wiremock.client.WireMock.get;
-// import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-// import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-// import static org.assertj.core.api.Assertions.assertThat;
-
-// import org.junit.ClassRule;
-// import org.junit.Test;
-// import org.junit.runner.RunWith;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.context.SpringBootTest;
-// import org.springframework.cloud.contract.wiremock.AutoConfigureHttpClient;
-// import org.springframework.cloud.contract.wiremock.WireMockSpring;
-// import org.springframework.test.annotation.DirtiesContext;
-// import org.springframework.test.context.junit4.SpringRunner;
-
-// import com.github.tomakehurst.wiremock.junit.WireMockClassRule; 
-
-// import xyz.idtlabs.smsgateway.sms.domain.Message;
-// import xyz.idtlabs.smsgateway.sms.service.SmsDeliver; 
+package xyz.idtlabs.smsgateway.sms.api; 
 
 
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import xyz.idtlabs.smsgateway.MessageGateway;
+import xyz.idtlabs.smsgateway.sms.domain.Message;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.TestRestTemplate;
+
+
+/**
+ * Integration test for testing out the /http/send URL call for sending a message to backend.   
+ * 
+ * 
+ * 
+ */ 
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes=MessageGateway.class)
+@EnableAutoConfiguration
+@IntegrationTest("server.port:8089")
+public class SMSApiResourceIntegrationTest{ 
+	
+	TestRestTemplate testRestTemplate; 
+	ResponseEntity<String> response;
+	
+	@Before
+    public void setup() throws Exception {
+		testRestTemplate = new TestRestTemplate();
+        response = null;
+    }
+	
+	@Rule
+    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089).httpsPort(8443));
+	
+	
+	@Test
+	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
+		TestRestTemplate testRestTemplate = new TestRestTemplate("idtlabs","idtlabs"); 
+		stubFor(get(urlPathMatching("/messages/http/send"))
+				.withBasicAuth("idtlabs", "idtlabs")
+				.withQueryParam("apiKey", equalTo("12345678"))
+				.withQueryParam("to", equalTo("+23277775775"))
+				.withQueryParam("body", equalTo("helloText"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        ));  
+		
+		String url = "http://localhost:8089/messages/http/send";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+				.queryParam("apiKey", "12345678")
+				.queryParam("to", "+23277775775")
+				.queryParam("body", "helloText");
+		
+		String sendMessageGet = builder.build().toString();
+		response = testRestTemplate.getForEntity(sendMessageGet, String.class);
+		
+		assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
+		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
+	}
+}
 
 // @RunWith(SpringRunner.class)
 // @SpringBootTest("app.baseUrl=https://localhost:6443")
