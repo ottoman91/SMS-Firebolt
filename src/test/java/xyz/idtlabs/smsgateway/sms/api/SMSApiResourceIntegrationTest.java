@@ -33,18 +33,19 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.IntegrationTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import xyz.idtlabs.smsgateway.MessageGateway;
-import xyz.idtlabs.smsgateway.sms.domain.Message;
+
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 
 /**
@@ -54,30 +55,37 @@ import org.springframework.boot.test.TestRestTemplate;
  * 
  */ 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes=MessageGateway.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes=MessageGateway.class,webEnvironment=WebEnvironment.DEFINED_PORT)
 @EnableAutoConfiguration
-@IntegrationTest("server.port:8089")
 public class SMSApiResourceIntegrationTest{ 
 	
-	TestRestTemplate testRestTemplate; 
+	
+
+	@Autowired
+    private TestRestTemplate template = new TestRestTemplate(); 
+	
+	
 	ResponseEntity<String> response;
 	
 	@Before
     public void setup() throws Exception {
-		testRestTemplate = new TestRestTemplate();
+		this.template = new TestRestTemplate("idtlabsuser","idtlabs");
         response = null;
     }
 	
 	@Rule
-    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089).httpsPort(8443));
+    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8099));  
+	
+	
+//	@Rule
+//	public WireMockRule wireMockRule = new WireMockRule();
 	
 	
 	@Test
 	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
-		TestRestTemplate testRestTemplate = new TestRestTemplate("idtlabs","idtlabs"); 
 		stubFor(get(urlPathMatching("/messages/http/send"))
-				.withBasicAuth("idtlabs", "idtlabs")
+				.withBasicAuth("idtlabsuser", "idtlabs")
 				.withQueryParam("apiKey", equalTo("12345678"))
 				.withQueryParam("to", equalTo("+23277775775"))
 				.withQueryParam("body", equalTo("helloText"))
@@ -85,14 +93,15 @@ public class SMSApiResourceIntegrationTest{
                         .withStatus(HttpStatus.OK.value())
                         ));  
 		
-		String url = "http://localhost:8089/messages/http/send";
+		String url = "http://localhost:8099/messages/http/send";
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
 				.queryParam("apiKey", "12345678")
 				.queryParam("to", "+23277775775")
 				.queryParam("body", "helloText");
 		
 		String sendMessageGet = builder.build().toString();
-		response = testRestTemplate.getForEntity(sendMessageGet, String.class);
+		response = this.template.getForEntity(sendMessageGet, String.class);
+		
 		
 		assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
 		verify(getRequestedFor(urlPathMatching("/messages/http/send")));

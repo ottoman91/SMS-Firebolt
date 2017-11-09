@@ -24,7 +24,7 @@ import xyz.idtlabs.smsgateway.sms.domain.SMSBridgeConfig;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
