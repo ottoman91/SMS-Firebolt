@@ -45,7 +45,6 @@ public class KannelBackend implements HttpSMSBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(KannelBackend.class);  
     private final String url;
-    //private final int port;
     private final String userName;
     private final String password;
 
@@ -53,8 +52,6 @@ public class KannelBackend implements HttpSMSBackend {
     public KannelBackend(
         @Value("${kannel.url}")
         String url,
-        //@Value("${port}")
-        //String port,
         @Value("${kannel.username}")
         String userName,
         @Value("${kannel.password}")
@@ -62,7 +59,7 @@ public class KannelBackend implements HttpSMSBackend {
         this.url = url;
         this.userName = userName;
         this.password = password;
-        //this.port = Integer.parseInt(port);
+        
     }
 
     @Override
@@ -96,6 +93,9 @@ public class KannelBackend implements HttpSMSBackend {
         HttpUrl kannelUrl = new HttpUrl.Builder()
             .scheme("http")
             .host(url)
+            .port(8099)
+            .addPathSegment("cgi-bin")
+            .addPathSegment("sendsms")
             .build(); 
         logger.info(url);
             

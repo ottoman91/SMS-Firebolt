@@ -23,17 +23,28 @@ package xyz.idtlabs.smsgateway.sms.api;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +52,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
+import okhttp3.HttpUrl;
 import xyz.idtlabs.smsgateway.MessageGateway;
+import xyz.idtlabs.smsgateway.sms.service.HttpSMSBackend;
+import xyz.idtlabs.smsgateway.sms.service.HttpSmsDeliver;
+import xyz.idtlabs.smsgateway.sms.service.KannelBackend;
+import xyz.idtlabs.smsgateway.sms.service.SmsDeliver;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 
 /**
@@ -56,15 +77,60 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
  */ 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=MessageGateway.class,webEnvironment=WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes=MessageGateway.class,webEnvironment=WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
+@PropertySource("classpath:config.properties")
 public class SMSApiResourceIntegrationTest{ 
 	
+	@Configuration
+	static class EmployeeServiceImplTestContextConfiguration {
+		
+		@Value("${kannel.url}")
+		private String kannelUrl;
+		
+		@Value("${kannel.username}")
+	    private String kannelUserName; 
+		
+		@Value("${kannel.password}")
+		private String kannelPassword; 
 	
-
+		
+		
+        @Bean
+        public SmsDeliver smsDeliver() {
+            return new HttpSmsDeliver(); 
+   
+        } 
+        
+        @Bean
+        public HttpSMSBackend httpSmsBackend(){
+        	return new KannelBackend(kannelUrl,kannelUserName,kannelPassword);
+        } 
+        
+//        @Bean
+//        public HttpSMSBackend httpSmsBackend(){
+//        	return Mockito.mock(HttpSMSBackend.class);
+//        }
+    } 
+	
+//	private HttpUrl kannelUrl = new HttpUrl.Builder()
+//            .scheme("http")
+//            .host("gamespot.com")
+//            .build(); 
+	
+	
+//	private String url = kannelUrl.toString();
+	
 	@Autowired
     private TestRestTemplate template = new TestRestTemplate(); 
 	
+	@Autowired
+	private SmsDeliver smsDeliver;  
+	
+//	@Autowired
+//	private HttpSMSBackend httpSMSBackend;
+	
+
 	
 	ResponseEntity<String> response;
 	
@@ -72,6 +138,9 @@ public class SMSApiResourceIntegrationTest{
     public void setup() throws Exception {
 		this.template = new TestRestTemplate("idtlabsuser","idtlabs");
         response = null;
+        //MockitoAnnotations.initMocks(this);
+        //Mockito.when(httpSMSBackend.buildRequest("testMessage","123456")).thenReturn(kannelUrl);
+       
     }
 	
 	@Rule
@@ -82,78 +151,52 @@ public class SMSApiResourceIntegrationTest{
 //	public WireMockRule wireMockRule = new WireMockRule();
 	
 	
+//	@Test
+//	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
+//		stubFor(get(urlPathMatching("/messages/http/send"))
+//				.withBasicAuth("idtlabsuser", "idtlabs")
+//				.withQueryParam("apiKey", equalTo("12345678"))
+//				.withQueryParam("to", equalTo("+23277775775"))
+//				.withQueryParam("body", equalTo("helloText"))
+//                .willReturn(aResponse()
+//                        .withStatus(HttpStatus.OK.value())
+//                        ));  
+//		
+//		String url = "http://localhost:8099/messages/http/send";
+//		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+//				.queryParam("apiKey", "12345678")
+//				.queryParam("to", "+23277775775")
+//				.queryParam("body", "helloText");
+//		
+//		String sendMessageGet = builder.build().toString();
+//		response = this.template.getForEntity(sendMessageGet, String.class);
+//		
+//		
+//		assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
+//		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
+//	} 
+//	
+	
+	/**
+     * Test for checking the validation of the client and the message sent
+     * 
+     */ 
 	@Test
-	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
-		stubFor(get(urlPathMatching("/messages/http/send"))
-				.withBasicAuth("idtlabsuser", "idtlabs")
-				.withQueryParam("apiKey", equalTo("12345678"))
-				.withQueryParam("to", equalTo("+23277775775"))
-				.withQueryParam("body", equalTo("helloText"))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.OK.value())
-                        ));  
+    public void given_ValidMessageWithApiKey_RecordMessageInDatabaseAndSendToKannel(){ 
 		
-		String url = "http://localhost:8099/messages/http/send";
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-				.queryParam("apiKey", "12345678")
-				.queryParam("to", "+23277775775")
-				.queryParam("body", "helloText");
-		
-		String sendMessageGet = builder.build().toString();
-		response = this.template.getForEntity(sendMessageGet, String.class);
-		
-		
-		assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
-		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
-	}
+		wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms")).willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+                    
+        smsDeliver.send("testMessage", "123456");
+        
+	    verify(getRequestedFor(urlPathMatching("/cgi-bin/sendsms")));
+
+
+}
+	
+	
 }
 
-// @RunWith(SpringRunner.class)
-// @SpringBootTest("app.baseUrl=https://localhost:6443")
-// @DirtiesContext
-// @AutoConfigureHttpClient
-// public class WiremockHttpsServerApplicationTests {
-
-//     @ClassRule
-//     public static WireMockClassRule wiremock = new WireMockClassRule(
-//             WireMockSpring.options().httpsPort(6443));
-
-//     @Autowired
-//     private SmsDeliver smsDeliver;
-
-//     private Message message = new Message();
-    
-//     // @Test
-//     // public void sendingMessageToKannelBackend() throws Exception {
-//     //     stubFor(post(urlEqualTo("/messages"))
-//     //             .willReturn(aResponse().withHeader("Content-Type", "text/plain").withBody("Hello World!")));
-//     //     assertThat(this.service.go()).isEqualTo("Hello World!");
-//     // } 
-
-//     @Test
-//     public void sendingMessageToKannelBackend() throws Exception {
-//         stubFor(post(urlEqualTo("/messages"))
-//                 .withHeader("Content-Type", equalTo("application/json"))
-//                 .withRequestBody(containing("\"name\": \"John Doe\""))
-//                 .withRequestBody(containing("\"displayName\": \"John Doe MFI\""))
-//                 .willReturn(aResponse().withStatus(200)));
-
-//         InputStream jsonInputStream = this.getClass().getClassLoader().getResourceAsStream("wiremock_intro.json");
-//         String jsonString = convertInputStreamToString(jsonInputStream);
-//         StringEntity entity = new StringEntity(jsonString);
-
-//         CloseableHttpClient httpClient = HttpClients.createDefault();
-//         HttpPost request = new HttpPost("http://localhost:8080/clients");
-//         request.addHeader("Content-Type", APPLICATION_JSON);
-//         request.setEntity(entity);
-//         HttpResponse response = httpClient.execute(request);
-
-//         verify(postRequestedFor(urlEqualTo(BAELDUNG_WIREMOCK_PATH))
-//                 .withHeader("Content-Type", equalTo(APPLICATION_JSON)));
-//         assertEquals(200, response.getStatusLine().getStatusCode());
-//     }
-
-// }
+//
 
 
 
@@ -161,59 +204,7 @@ public class SMSApiResourceIntegrationTest{
 
 
 
-// // //code snippet from the official wiredoc stuff.
-// // // public class SMSApiResourceIntegrationTest {
 
-// // //     private static final String SMS_MESSAGE_API = "/clients";
-// // //     private static final String APPLICATION_JSON = "application/json";
-
-// // //     @Rule
-// // //     public WireMockRule wireMockRule = new WireMockRule();
-
-  
-// // //     @Test
-// // //     public void givenJUnitManagedServer_whenMatchingBody_thenCorrect() throws IOException {
-// // //         stubFor(post(urlEqualTo(SMS_MESSAGE_API))
-// // //                 .withHeader("Content-Type", equalTo(APPLICATION_JSON))
-// // //                 .withRequestBody(containing("\"name\": \"John Doe\""))
-// // //                 .withRequestBody(containing("\"displayName\": \"John Doe MFI\""))
-// // //                 .willReturn(aResponse().withStatus(200)));
-
-// // //         InputStream jsonInputStream = this.getClass().getClassLoader().getResourceAsStream("wiremock_intro.json");
-// // //         String jsonString = convertInputStreamToString(jsonInputStream);
-// // //         StringEntity entity = new StringEntity(jsonString);
-
-// // //         CloseableHttpClient httpClient = HttpClients.createDefault();
-// // //         HttpPost request = new HttpPost("http://localhost:8080/clients");
-// // //         request.addHeader("Content-Type", APPLICATION_JSON);
-// // //         request.setEntity(entity);
-// // //         HttpResponse response = httpClient.execute(request);
-
-// // //         verify(postRequestedFor(urlEqualTo(BAELDUNG_WIREMOCK_PATH))
-// // //                 .withHeader("Content-Type", equalTo(APPLICATION_JSON)));
-// // //         assertEquals(200, response.getStatusLine().getStatusCode());
-// // //     }
-
-
-// // //     private static String convertHttpResponseToString(HttpResponse httpResponse) throws IOException {
-// // //         InputStream inputStream = httpResponse.getEntity().getContent();
-// // //         return convertInputStreamToString(inputStream);
-// // //     }
-
-// // //     private static String convertInputStreamToString(InputStream inputStream) {
-// // //         Scanner scanner = new Scanner(inputStream, "UTF-8");
-// // //         String string = scanner.useDelimiter("\\Z").next();
-// // //         scanner.close();
-// // //         return string;
-// // //     }
-
-// // //     private HttpResponse generateClientAndReceiveResponseForPriorityTests() throws IOException {
-// // //         CloseableHttpClient httpClient = HttpClients.createDefault();
-// // //         HttpGet request = new HttpGet("http://localhost:8080/baeldung/wiremock");
-// // //         request.addHeader("Accept", "text/xml");
-// // //         return httpClient.execute(request);
-// // //     }
-// // // }
 
 
 
