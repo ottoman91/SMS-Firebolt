@@ -23,26 +23,17 @@ package xyz.idtlabs.smsgateway.sms.api;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig; 
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,7 +44,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
-import okhttp3.HttpUrl;
 import xyz.idtlabs.smsgateway.MessageGateway;
 import xyz.idtlabs.smsgateway.sms.service.HttpSMSBackend;
 import xyz.idtlabs.smsgateway.sms.service.HttpSmsDeliver;
@@ -92,34 +82,20 @@ public class SMSApiResourceIntegrationTest{
 	    private String kannelUserName; 
 		
 		@Value("${kannel.password}")
-		private String kannelPassword; 
-	
+		private String kannelPassword;  
 		
+		@Value("#{new Integer('${kannel.port}')}")
+	    private int kannelPort;
 		
         @Bean
         public SmsDeliver smsDeliver() {
             return new HttpSmsDeliver(); 
-   
         } 
-        
         @Bean
         public HttpSMSBackend httpSmsBackend(){
-        	return new KannelBackend(kannelUrl,kannelUserName,kannelPassword);
+        	return new KannelBackend(kannelUrl,kannelPort,kannelUserName,kannelPassword);
         } 
-        
-//        @Bean
-//        public HttpSMSBackend httpSmsBackend(){
-//        	return Mockito.mock(HttpSMSBackend.class);
-//        }
     } 
-	
-//	private HttpUrl kannelUrl = new HttpUrl.Builder()
-//            .scheme("http")
-//            .host("gamespot.com")
-//            .build(); 
-	
-	
-//	private String url = kannelUrl.toString();
 	
 	@Autowired
     private TestRestTemplate template = new TestRestTemplate(); 
@@ -127,54 +103,42 @@ public class SMSApiResourceIntegrationTest{
 	@Autowired
 	private SmsDeliver smsDeliver;  
 	
-//	@Autowired
-//	private HttpSMSBackend httpSMSBackend;
-	
-
-	
 	ResponseEntity<String> response;
 	
 	@Before
     public void setup() throws Exception {
 		this.template = new TestRestTemplate("idtlabsuser","idtlabs");
         response = null;
-        //MockitoAnnotations.initMocks(this);
-        //Mockito.when(httpSMSBackend.buildRequest("testMessage","123456")).thenReturn(kannelUrl);
-       
+        
     }
 	
 	@Rule
     public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8099));  
 	
-	
-//	@Rule
-//	public WireMockRule wireMockRule = new WireMockRule();
-	
-	
-//	@Test
-//	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
-//		stubFor(get(urlPathMatching("/messages/http/send"))
-//				.withBasicAuth("idtlabsuser", "idtlabs")
-//				.withQueryParam("apiKey", equalTo("12345678"))
-//				.withQueryParam("to", equalTo("+23277775775"))
-//				.withQueryParam("body", equalTo("helloText"))
-//                .willReturn(aResponse()
-//                        .withStatus(HttpStatus.OK.value())
-//                        ));  
-//		
-//		String url = "http://localhost:8099/messages/http/send";
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-//				.queryParam("apiKey", "12345678")
-//				.queryParam("to", "+23277775775")
-//				.queryParam("body", "helloText");
-//		
-//		String sendMessageGet = builder.build().toString();
-//		response = this.template.getForEntity(sendMessageGet, String.class);
-//		
-//		
-//		assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
-//		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
-//	} 
+	@Test
+	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
+		wireMockRule.stubFor(get(urlPathMatching("/messages/http/send"))
+				.withBasicAuth("idtlabsuser", "idtlabs")
+				.withQueryParam("apiKey", equalTo("12345678"))
+				.withQueryParam("to", equalTo("+23277775775"))
+				.withQueryParam("body", equalTo("helloText"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        ));  
+		
+		String url = "http://localhost:8099/messages/http/send";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+				.queryParam("apiKey", "12345678")
+				.queryParam("to", "+23277775775")
+				.queryParam("body", "helloText");
+		
+		String sendMessageGet = builder.build().toString();
+		response = this.template.getForEntity(sendMessageGet, String.class);
+		
+		
+		//assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
+		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
+	} 
 //	
 	
 	/**

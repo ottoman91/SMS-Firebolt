@@ -47,11 +47,14 @@ public class KannelBackend implements HttpSMSBackend {
     private final String url;
     private final String userName;
     private final String password;
+    private final int port;
 
     @Autowired
     public KannelBackend(
         @Value("${kannel.url}")
         String url,
+        @Value("#{new Integer('${kannel.port}')}")
+        int kannelPort,
         @Value("${kannel.username}")
         String userName,
         @Value("${kannel.password}")
@@ -59,6 +62,7 @@ public class KannelBackend implements HttpSMSBackend {
         this.url = url;
         this.userName = userName;
         this.password = password;
+        this.port = kannelPort;
         
     }
 
@@ -93,7 +97,7 @@ public class KannelBackend implements HttpSMSBackend {
         HttpUrl kannelUrl = new HttpUrl.Builder()
             .scheme("http")
             .host(url)
-            .port(8099)
+            .port(port)
             .addPathSegment("cgi-bin")
             .addPathSegment("sendsms")
             .build(); 
