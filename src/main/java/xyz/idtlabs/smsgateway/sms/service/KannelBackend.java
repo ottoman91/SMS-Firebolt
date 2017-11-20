@@ -18,26 +18,14 @@
  */
 package xyz.idtlabs.smsgateway.sms.service;
 
-import xyz.idtlabs.smsgateway.sms.domain.Message;
-import okhttp3.HttpUrl.Builder;
 import okhttp3.HttpUrl;
 import org.springframework.stereotype.Service; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource; 
 import org.springframework.context.annotation.PropertySource;
 import java.lang.Override; 
-import java.util.Properties; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ClassLoader;
-import java.lang.Thread;
-import java.lang.Integer;
-
-
-
 
 @Service
 @PropertySource("classpath:config.properties")
@@ -74,36 +62,36 @@ public class KannelBackend implements HttpSMSBackend {
     //function that creates the kannel URL from the message object passed to it
     private HttpUrl createKannelUrl(String message, String number){    
        
-        //String numbers = message.getTo();
-        //String messageBody = message.getBody();
+//        
 
         
-    //     HttpUrl kannelUrl = new HttpUrl.Builder()
-    //         .scheme("https")
-    //         .host(url)
-    //         .port(port)
-    //         .addPathSegment("cgi-bin")
-    //         .addPathSegment("sendsms")
-    //         .addQueryParameter("username", userName)
-    //         .addQueryParameter("password", password)
-    //         .addQueryParameter("to", number)
-    //         .addQueryParameter("text", message)
-    //         .build(); 
-    //     logger.info(url);
+         HttpUrl kannelUrl = new HttpUrl.Builder()
+             .scheme("http")
+             .host(url)
+             .port(port)
+             .addPathSegment("cgi-bin")
+             .addPathSegment("sendsms")
+             .addQueryParameter("username", userName)
+             .addQueryParameter("password", password)
+             .addQueryParameter("to", number)
+             .addQueryParameter("text", message)
+             .build(); 
+         logger.info(url);
             
-    //     return kannelUrl;
+         return kannelUrl;
     // } 
 
-        HttpUrl kannelUrl = new HttpUrl.Builder()
-            .scheme("http")
-            .host(url)
-            .port(port)
-            .addPathSegment("cgi-bin")
-            .addPathSegment("sendsms")
-            .build(); 
-        logger.info(url);
-            
-        return kannelUrl;
+    	//only for testing purposes
+//        HttpUrl kannelUrl = new HttpUrl.Builder()
+//            .scheme("http")
+//            .host(url)
+//            .port(port)
+//            .addPathSegment("cgi-bin")
+//            .addPathSegment("sendsms")
+//            .build(); 
+//        logger.info(url);
+//            
+//        return kannelUrl;
     }
   
 }

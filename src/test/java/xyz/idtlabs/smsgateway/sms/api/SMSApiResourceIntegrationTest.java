@@ -72,21 +72,24 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @PropertySource("classpath:config.properties")
 public class SMSApiResourceIntegrationTest{ 
 	
+	private int userName;
+	private int password;
+	
 	@Configuration
 	static class EmployeeServiceImplTestContextConfiguration {
 		
 		@Value("${kannel.url}")
-		private String kannelUrl;
+		String kannelUrl;
 		
 		@Value("${kannel.username}")
-	    private String kannelUserName; 
+	    String kannelUserName; 
 		
 		@Value("${kannel.password}")
-		private String kannelPassword;  
+		String kannelPassword;  
 		
 		@Value("#{new Integer('${kannel.port}')}")
-	    private int kannelPort;
-		
+	    int kannelPort; 
+				
         @Bean
         public SmsDeliver smsDeliver() {
             return new HttpSmsDeliver(); 
@@ -109,7 +112,7 @@ public class SMSApiResourceIntegrationTest{
     public void setup() throws Exception {
 		this.template = new TestRestTemplate("idtlabsuser","idtlabs");
         response = null;
-        
+            
     }
 	
 	@Rule
@@ -135,8 +138,6 @@ public class SMSApiResourceIntegrationTest{
 		String sendMessageGet = builder.build().toString();
 		response = this.template.getForEntity(sendMessageGet, String.class);
 		
-		
-		//assertThat("Verify Status Code", response.getStatusCode().equals(HttpStatus.OK));
 		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
 	} 
 //	
@@ -148,7 +149,12 @@ public class SMSApiResourceIntegrationTest{
 	@Test
     public void given_ValidMessageWithApiKey_RecordMessageInDatabaseAndSendToKannel(){ 
 		
-		wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms")).willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
+				.withQueryParam("username",equalTo("kannel"))
+				.withQueryParam("password", equalTo("kannel"))
+				.withQueryParam("to", equalTo("123456"))
+				.withQueryParam("text", equalTo("testMessage"))
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
                     
         smsDeliver.send("testMessage", "123456");
         
