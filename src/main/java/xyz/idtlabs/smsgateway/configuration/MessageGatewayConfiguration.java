@@ -37,8 +37,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Configuration
 @EnableAutoConfiguration
 @EnableJpaRepositories(basePackages = {
-        "xyz.idtlabs.smsgateway.sms.repository",
-        "xyz.idtlabs.smsgateway.tenants.repository"
+        "xyz.idtlabs.smsgateway.*"
 		
 })
 @EntityScan(basePackageClasses = {

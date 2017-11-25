@@ -23,6 +23,5 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import({ MessageGatewayConfiguration.class, SpringConfiguringClass.class })
-public class SmsFireboltConfiguration {
-
+public class SmsFireboltConfiguration { 
 }

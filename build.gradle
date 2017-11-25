@@ -69,6 +69,8 @@ dependencies {
     testCompile "com.github.tomakehurst:wiremock-standalone:2.10.1"
     //testCompile('com.jayway.jsonpath:json-path:0.9.1') 
     // testCompile('org.hamcrest:java-hamcrest:1.3.0')
+    testCompile('com.h2database:h2')
+    
 
     
 }

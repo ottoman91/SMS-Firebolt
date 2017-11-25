@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.sms.api; 
+package xyz.idtlabs.smsgateway; 
 
 
 
@@ -32,10 +32,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection.H2;
+
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +53,7 @@ import xyz.idtlabs.smsgateway.sms.service.HttpSMSBackend;
 import xyz.idtlabs.smsgateway.sms.service.HttpSmsDeliver;
 import xyz.idtlabs.smsgateway.sms.service.KannelBackend;
 import xyz.idtlabs.smsgateway.sms.service.SmsDeliver;
+import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -70,6 +75,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @SpringBootTest(classes=MessageGateway.class,webEnvironment=WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 @PropertySource("classpath:config.properties")
+@AutoConfigureTestDatabase(connection = H2)
 public class SMSApiResourceIntegrationTest{ 
 	
 	private int userName;
@@ -101,11 +107,11 @@ public class SMSApiResourceIntegrationTest{
     } 
 	
 	@Autowired
-    private TestRestTemplate template = new TestRestTemplate(); 
-	
+    private TestRestTemplate template = new TestRestTemplate();  
+		
 	@Autowired
-	private SmsDeliver smsDeliver;  
-	
+	private SmsDeliver smsDeliver;   
+		
 	ResponseEntity<String> response;
 	
 	@Before
