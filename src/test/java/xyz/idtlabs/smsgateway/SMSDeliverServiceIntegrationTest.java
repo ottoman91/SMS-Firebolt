@@ -17,9 +17,6 @@
  * under the License.
  */
 package xyz.idtlabs.smsgateway; 
-
-
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -62,25 +59,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-
 /**
- * Integration test for testing out the /http/send URL call for sending a message to backend.   
- * 
- * 
- * 
+ * Integration test for testing out the /http/send URL call for sending a message to Kannel Backend.   
  */ 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=MessageGateway.class,webEnvironment=WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 @PropertySource("classpath:config.properties")
-@AutoConfigureTestDatabase(connection = H2)
-public class SMSApiResourceIntegrationTest{ 
-	
-	private int userName;
-	private int password;
-	
+public class SMSDeliverServiceIntegrationTest{ 
+		
 	@Configuration
 	static class EmployeeServiceImplTestContextConfiguration {
 		
@@ -107,53 +95,13 @@ public class SMSApiResourceIntegrationTest{
     } 
 	
 	@Autowired
-    private TestRestTemplate template = new TestRestTemplate();  
-		
-	@Autowired
 	private SmsDeliver smsDeliver;   
-		
-	ResponseEntity<String> response;
-	
-	@Before
-    public void setup() throws Exception {
-		this.template = new TestRestTemplate("idtlabsuser","idtlabs");
-        response = null;
-            
-    }
-	
+			
 	@Rule
     public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8099));  
-	
+		
 	@Test
-	public void givenValidSingleMessageValues_thenVerifyValues_thenSendToBackend(){  
-		wireMockRule.stubFor(get(urlPathMatching("/messages/http/send"))
-				.withBasicAuth("idtlabsuser", "idtlabs")
-				.withQueryParam("apiKey", equalTo("12345678"))
-				.withQueryParam("to", equalTo("+23277775775"))
-				.withQueryParam("body", equalTo("helloText"))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.OK.value())
-                        ));  
-		
-		String url = "http://localhost:8099/messages/http/send";
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-				.queryParam("apiKey", "12345678")
-				.queryParam("to", "+23277775775")
-				.queryParam("body", "helloText");
-		
-		String sendMessageGet = builder.build().toString();
-		response = this.template.getForEntity(sendMessageGet, String.class);
-		
-		verify(getRequestedFor(urlPathMatching("/messages/http/send")));
-	} 
-//	
-	
-	/**
-     * Test for checking the validation of the client and the message sent
-     * 
-     */ 
-	@Test
-    public void given_ValidMessageWithApiKey_RecordMessageInDatabaseAndSendToKannel(){ 
+    public void sendMessageToKannelBackend(){ 
 		
 		wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
 				.withQueryParam("username",equalTo("kannel"))
@@ -165,14 +113,8 @@ public class SMSApiResourceIntegrationTest{
         smsDeliver.send("testMessage", "123456");
         
 	    verify(getRequestedFor(urlPathMatching("/cgi-bin/sendsms")));
-
-
+}	
 }
-	
-	
-}
-
-//
 
 
 

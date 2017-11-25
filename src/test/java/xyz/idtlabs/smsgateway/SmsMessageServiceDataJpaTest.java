@@ -42,7 +42,7 @@ import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnec
 @ContextConfiguration(classes=SmsFireboltConfiguration.class)
 @PropertySource("classpath:config.properties")
 @AutoConfigureTestDatabase(connection = H2)
-public class SmsMessageServiceIntegrationTest { 
+public class SmsMessageServiceDataJpaTest { 
 	
 	@Autowired
 	private SMSMessageService smsMessageService;
