@@ -62,21 +62,13 @@ public class SmsMessageServiceDataJpaTest {
 	@Test
     public void saveMessageToDatabaseSuccessfully() throws Exception {
         Tenant testClient = new Tenant("defaultApiKey","testClient", "testClientDisplay"); 
-        
-        tenantRepository.save(testClient); 
-        
+        tenantRepository.save(testClient);         
         Tenant retrievedClient = tenantRepository.findByName("testClient");
-        
         assertEquals("client record stored successfully",testClient.getName(),retrievedClient.getName());   
-        
-        String apiKey = retrievedClient.getApiKey(); 
-        
+        String apiKey = retrievedClient.getApiKey();
         Long tenantId = retrievedClient.getId();
-        
         smsMessageService.saveSMS(apiKey, "+23277775775", "helloText"); 
-        
         SMSMessage message = smsOutboundMessageRepository.findByTenantId(tenantId);  
-        
         assertEquals("message is retrieved properly","helloText",message.getMessage());
     }
 }
