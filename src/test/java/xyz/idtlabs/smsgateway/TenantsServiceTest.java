@@ -32,6 +32,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
+import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
@@ -75,12 +76,13 @@ public class TenantsServiceTest {
 
     @Test
     @WithMockUser(roles={"ADMIN"})
-    public void createTenant_FailWhenNewClientNotRetrievedViaNameFromDatabase() {
+    public void createTenant_FailWhenNewClientNotRetrievedViaNameSearchFromDatabase() {
 
         Tenant testClient = new Tenant("defaultApiKey","testClient", "testClientDisplay");
         Tenant savedTestClient = tenantService.createTenant(testClient);
         Tenant retrievedTestClientFromDatabase = tenantRepository.findByName(savedTestClient.getName());
-        assertEquals("Failed to retrieve new client from database",savedTestClient,retrievedTestClientFromDatabase);
+        assertEquals("Failed to retrieve new client from database",savedTestClient,
+                retrievedTestClientFromDatabase);
 
     }
 
@@ -105,7 +107,7 @@ public class TenantsServiceTest {
 
     @Test
 	@WithMockUser(roles = {"ADMIN"})
-	public void findTenantById_FailWhenExistingClientNotRetrievedViaId(){
+	public void findTenantById_FailWhenExistingClientNotRetrievedViaClientIdSearch(){
 		Tenant testClient = new Tenant("defaultApiKey","testClient","testClientDisplay");
 		Tenant savedTestClient = tenantService.createTenant(testClient);
 		long clientId = savedTestClient.getId();
@@ -157,7 +159,8 @@ public class TenantsServiceTest {
         long clientId = savedTestClient.getId();
         tenantService.updateTenant(savedTestClient);
         Tenant retrievedClient = tenantService.findTenantById(clientId);
-        assertEquals("Client Display Name not Updated","newTestClientDisplay",retrievedClient.getDisplayName());
+        assertEquals("Client Display Name not Updated","newTestClientDisplay",
+                retrievedClient.getDisplayName());
     }
 
     @Test
@@ -171,7 +174,8 @@ public class TenantsServiceTest {
         tenantService.updateTenant(savedTestClient);
         Tenant retrievedClient = tenantService.findTenantById(clientId);
         assertEquals("Client Name not Updated","newTestClient",retrievedClient.getName());
-        assertEquals("Client Display Name not Updated","newTestClientDisplay",retrievedClient.getDisplayName());
+        assertEquals("Client Display Name not Updated","newTestClientDisplay",
+                retrievedClient.getDisplayName());
     }
 
     @Test
@@ -202,7 +206,8 @@ public class TenantsServiceTest {
         long clientId = savedTestClient.getId();
         String clientBlockStatusMessage = tenantService.blockClient(clientId);
         assertEquals("Client Blocked Status Not Set to True",true,savedTestClient.getBlocked());
-        assertEquals("Incorrect Message for Blocking non-blocked Client","Client has been blocked now",clientBlockStatusMessage);
+        assertEquals("Incorrect Message for Blocking non-blocked Client",
+                "Client has been blocked now",clientBlockStatusMessage);
     }
 
     @Test
@@ -214,7 +219,8 @@ public class TenantsServiceTest {
         long clientId = savedTestClient.getId();
         String clientBlockStatusMessage = tenantService.blockClient(clientId);
         assertEquals("Client Blocked Status Not Set to True",true,savedTestClient.getBlocked());
-        assertEquals("Incorrect Message for Blocking blocked Client","Client is already blocked",clientBlockStatusMessage);
+        assertEquals("Incorrect Message for Blocking blocked Client",
+                "Client is already blocked",clientBlockStatusMessage);
     }
 
     @Test
@@ -226,7 +232,8 @@ public class TenantsServiceTest {
         long clientId = savedTestClient.getId();
         String clientBlockStatusMessage = tenantService.unblockClient(clientId);
         assertEquals("Client Unblocked Status Not Set to False",false,savedTestClient.getBlocked());
-        assertEquals("Incorrect Message for Unblocking blocked Client","Client has been unblocked now",clientBlockStatusMessage);
+        assertEquals("Incorrect Message for Unblocking blocked Client",
+                "Client has been unblocked now",clientBlockStatusMessage);
     }
 
     @Test
@@ -237,12 +244,31 @@ public class TenantsServiceTest {
         long clientId = savedTestClient.getId();
         String clientBlockStatusMessage = tenantService.unblockClient(clientId);
         assertEquals("Client Unblocked Status Not Set to False",false,savedTestClient.getBlocked());
-        assertEquals("Incorrect Message for Unblocking already unblocked Client","Client is already unblocked",clientBlockStatusMessage);
+        assertEquals("Incorrect Message for Unblocking already unblocked Client",
+                "Client is already unblocked",clientBlockStatusMessage);
     }
 
+    @Test
+    @WithMockUser(roles = {"ADMIN","USER"})
+    public void confirmClientCanSendMessage_FailWhenAbleToConfirmClientWithWrongApiKey(){
+        Tenant testClient = new Tenant("defaultApiKey","testClient","testClientDisplay");
+        Tenant savedTestClient = tenantService.createTenant(testClient);
+        thrown.expect(PlatformApiDataValidationException.class);
+        thrown.reportMissingExceptionWithMessage("Failed to throw Data Validation Exception when checking for client " +
+                "with incorrect Api Key");
+        tenantService.confirmClientCanSendSms("123456");
+    }
 
-
-
-
-
+    @Test
+    @WithMockUser(roles = {"ADMIN","USER"})
+    public void confirmClientCanSendMessage_FailWhenAbleToConfirmBlockedClient(){
+        Tenant testClient = new Tenant("defaultApiKey","testClient","testClientDisplay");
+        testClient.setBlocked(true);
+        Tenant savedTestClient = tenantService.createTenant(testClient);
+        String clientApiKey = savedTestClient.getApiKey();
+        thrown.expect(PlatformApiDataValidationException.class);
+        thrown.reportMissingExceptionWithMessage("Failed to throw Data Validation Exception when checking for blocked" +
+                        "client");
+        tenantService.confirmClientCanSendSms(clientApiKey);
+    }
 }

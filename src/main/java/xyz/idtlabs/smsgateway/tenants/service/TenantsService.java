@@ -23,20 +23,14 @@ import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
 import xyz.idtlabs.smsgateway.helpers.ApiParameterError;
 import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException; 
-import xyz.idtlabs.smsgateway.tenants.exception.TenantsNotFoundException; 
-import xyz.idtlabs.smsgateway.tenants.exception.InvalidApiKeyException;
-import xyz.idtlabs.smsgateway.tenants.exception.ClientBlockedException;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service; 
 import java.util.List; 
 import org.springframework.data.domain.Page; 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.ArrayList;
-
-
 
 
 
@@ -68,13 +62,13 @@ public class TenantsService {
 		return tenant;
 	}
 	
-	public Tenant findTenantByNameAndApiKey(final String name, final String apiKey) {
-		Tenant tenant = this.tenantRepository.findByNameAndApiKey(name, apiKey) ;
-		if(tenant == null) {
-			throw new TenantNotFoundException(name, apiKey) ;
-		}
-		return tenant ;
-	} 
+//	public Tenant findTenantByNameAndApiKey(final String name, final String apiKey) {
+//		Tenant tenant = this.tenantRepository.findByNameAndApiKey(name, apiKey) ;
+//		if(tenant == null) {
+//			throw new TenantNotFoundException(name, apiKey) ;
+//		}
+//		return tenant ;
+//	}
 
 	public Tenant findTenantByApiKey(final String apiKey) {
 		Tenant tenant = this.tenantRepository.findByApiKey(apiKey) ;
@@ -92,13 +86,13 @@ public class TenantsService {
 		return tenant ;
 	}  
 
-	public Tenant findTenantByName(final String name) {
-		Tenant tenant = this.tenantRepository.findByName(name) ;
-		if(tenant == null) {
-			throw new TenantNotFoundException(name, "") ;
-		}
-		return tenant ;
-	}  
+//	public Tenant findTenantByName(final String name) {
+//		Tenant tenant = this.tenantRepository.findByName(name) ;
+//		if(tenant == null) {
+//			throw new TenantNotFoundException(name, "") ;
+//		}
+//		return tenant ;
+//	}
 
 	public Page<Tenant> findAllTenantsPaginated(int page, int size) {
         return tenantRepository.findAll(new PageRequest(page, size));
@@ -118,12 +112,12 @@ public class TenantsService {
 
 	}  
 
-    @PreAuthorize("hasRole('ADMIN')")
-	public void deleteTenantByName(final String name) {
-		Tenant tenant = this.tenantRepository.findByName(name) ; 
-		this.tenantRepository.delete(tenant);
-
-	} 
+//    @PreAuthorize("hasRole('ADMIN')")
+//	public void deleteTenantByName(final String name) {
+//		Tenant tenant = this.tenantRepository.findByName(name) ;
+//		this.tenantRepository.delete(tenant);
+//
+//	}
 
     @PreAuthorize("hasRole('ADMIN')")
 	public Tenant updateTenant(final Tenant tenant) {
