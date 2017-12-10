@@ -22,7 +22,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.UUID;
 
-import xyz.idtlabs.smsgateway.exception.SecurityException;
 import xyz.idtlabs.smsgateway.exception.UnexpectedException;
 import xyz.idtlabs.smsgateway.sms.domain.SMSBridge;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;

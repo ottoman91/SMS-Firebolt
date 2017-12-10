@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -42,7 +41,6 @@ import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 
-import javax.validation.constraints.AssertTrue;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -247,6 +245,7 @@ public class SMSMessageServiceTest {
         String number = "+23277775775";
         smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message);
         smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1);
+
 
         int numberOfMessagesSent = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(savedTestClient.getId(),
                 startingDate,currentDate);

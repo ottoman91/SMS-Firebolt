@@ -17,48 +17,26 @@
  * under the License.
  */
 package xyz.idtlabs.smsgateway; 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig; 
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
-import org.junit.Before;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection.H2;
-
-import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
-import xyz.idtlabs.smsgateway.MessageGateway;
 import xyz.idtlabs.smsgateway.sms.service.HttpSMSBackend;
 import xyz.idtlabs.smsgateway.sms.service.HttpSmsDeliver;
 import xyz.idtlabs.smsgateway.sms.service.KannelBackend;
 import xyz.idtlabs.smsgateway.sms.service.SmsDeliver;
-import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
-
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
 /**
  * Integration test for testing out the /http/send URL call for sending a message to Kannel Backend.   
  */ 
@@ -112,8 +90,8 @@ public class SMSDeliverServiceIntegrationTest{
                     
         smsDeliver.send("testMessage", "123456");
         
-	    verify(getRequestedFor(urlPathMatching("/cgi-bin/sendsms")));
-}	
+		verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?username=kannel&password=kannel&to=123456&text=testMessage")));
+}
 }
 
 

@@ -28,9 +28,7 @@ import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.helpers.PlatformApiDataValidationExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.PlatformApiInvalidParameterExceptionMapper;
-import xyz.idtlabs.smsgateway.helpers.PlatformResourceNotFoundExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
-import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
 import xyz.idtlabs.smsgateway.sms.domain.Message;
 import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService; 
@@ -49,11 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils; 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.annotation.ExceptionMetered;
-import com.codahale.metrics.annotation.Gauge;
 import com.codahale.metrics.annotation.Metered;
-import com.codahale.metrics.annotation.Timed;
 import com.ryantenney.metrics.annotation.Counted;
 
 

@@ -34,21 +34,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController; 
 import org.springframework.web.bind.annotation.PathVariable;  
 import org.springframework.web.bind.annotation.RequestParam;   
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.validation.annotation.Validated; 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.format.annotation.DateTimeFormat; 
 import org.springframework.data.domain.Page;  
-import org.springframework.data.domain.Pageable;
-import java.util.List; 
 import java.util.Date;
-import java.text.DateFormat;
-import java.util.List; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.logging.*;
-//import java.util.logging.Level;
-
-
 
 
 @RestController

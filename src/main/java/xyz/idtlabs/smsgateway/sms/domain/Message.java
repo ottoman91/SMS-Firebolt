@@ -18,13 +18,6 @@
  */
 package xyz.idtlabs.smsgateway.sms.domain;
 
-import java.util.Date;
-import java.text.DateFormat; 
-
-
-
-
-
 public class Message {
 
     private String id;  
@@ -35,10 +28,6 @@ public class Message {
 
     private String body;
 
-
-  
-
-    
 
     public void setId(final String id){
         this.id = id;

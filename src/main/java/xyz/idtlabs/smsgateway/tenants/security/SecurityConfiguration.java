@@ -20,9 +20,7 @@ package xyz.idtlabs.smsgateway.tenants.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.stereotype.Component;
-import org.springframework.context.annotation.Configuration; 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -34,16 +32,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.http.SessionCreationPolicy; 
 import org.springframework.security.provisioning.InMemoryUserDetailsManager; 
 import org.springframework.core.io.Resource; 
-import org.springframework.security.core.userdetails.UserDetailsService; 
-import java.util.Properties; 
+import java.util.Properties;
 import java.io.IOException;
-import org.springframework.security.core.userdetails.User; 
 import java.util.logging.*;
-
-
-
-
-
 
 @Configuration
 @EnableWebSecurity

@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
@@ -38,7 +39,6 @@ import xyz.idtlabs.smsgateway.tenants.exception.TenantNotFoundException;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import org.springframework.security.test.context.support.WithMockUser;  
-
 
 
 @RunWith(SpringRunner.class)
@@ -72,6 +72,17 @@ public class TenantsServiceTest {
 		assertEquals("New Client Name Not created",testClient.getName(),savedTestClient.getName());
 		assertEquals("New Client Display Name Not created",testClient.getDisplayName(),savedTestClient.getDisplayName());
 
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    public void findAllTenantsPaginated_FailWhenAllTenantsNotRetrieved(){
+	    Tenant testClient1 = new Tenant("defaultApiKey","testClient1","testClient1Display");
+	    Tenant testClient2 = new Tenant("defaultApiKey","testClient2","testClient2Display");
+	    Tenant savedTestClient1 = tenantService.createTenant(testClient1);
+	    Tenant savedTestClient2 = tenantService.createTenant(testClient2);
+        Page <Tenant> clientPage = tenantService.findAllTenantsPaginated(0,2);
+        assertEquals("All tenants not retrieved via pagination",2,clientPage.getTotalElements());
     }
 
     @Test
