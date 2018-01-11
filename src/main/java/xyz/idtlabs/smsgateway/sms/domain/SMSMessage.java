@@ -96,6 +96,8 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 		this.message = message;
 	}
 
+
+
 	public static SMSMessage getPendingMessages(final String externalId, final Long internalId,
 			final Long tenantId, final Date submittedOnDate,
 			final Date deliveredOnDate, final String deliveryErrorMessage, final String sourceAddress,

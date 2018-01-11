@@ -37,21 +37,24 @@ public class HttpSmsDeliver implements SmsDeliver {
     private static final Logger logger = LoggerFactory.getLogger(HttpSmsDeliver.class);  
 
     @Autowired 
-    HttpSMSBackend httpSMSBackend;  
+    HttpSMSBackend httpSMSBackend;
+
+
+
 
     @Override
-    public void send(String message, String number){  
+    public void send(String message, String number){
         HttpUrl sendMessageUrl = httpSMSBackend.buildRequest(message, number);
         OkHttpClient client = new OkHttpClient(); 
         Request request = new Request.Builder().url(sendMessageUrl).build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override public void onFailure(Call call, IOException e) {
-            logger.error("Could not Deliver SMS to Backend",e); 
+                logger.error("Could not deliver following SMS to Backend: "+ message.toString(),e);
             } 
-            @Override public void onResponse(Call call, Response response) throws IOException { 
-                logger.info("Message Delivered To Backend");
+            @Override public void onResponse(Call call, Response response) throws IOException {
+                logger.info("Message Delivered To Backend" + message.toString());
             }
-    });   
+    });
     }
 }

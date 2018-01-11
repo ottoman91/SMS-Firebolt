@@ -20,7 +20,7 @@ package xyz.idtlabs.smsgateway.sms.domain;
 
 public class Message {
 
-    private String id;  
+    private String apiMessageId;
 
     private boolean accepted;
 
@@ -29,12 +29,12 @@ public class Message {
     private String body;
 
 
-    public void setId(final String id){
-        this.id = id;
+    public void setApiMessageId(final String apiMessageId){
+        this.apiMessageId = apiMessageId;
     } 
 
-    public String getId(){
-        return id;
+    public String getApiMessageId(){
+        return apiMessageId;
     } 
 
     public void setAccepted(){

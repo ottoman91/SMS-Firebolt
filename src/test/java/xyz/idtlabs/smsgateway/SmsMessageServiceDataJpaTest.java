@@ -67,7 +67,7 @@ public class SmsMessageServiceDataJpaTest {
         assertEquals("client record stored successfully",testClient.getName(),retrievedClient.getName());   
         String apiKey = retrievedClient.getApiKey();
         Long tenantId = retrievedClient.getId();
-        smsMessageService.saveSMS(apiKey, "+23277775775", "helloText"); 
+        smsMessageService.saveSMS(apiKey, "+23277775775", "helloText");
         SMSMessage message = smsOutboundMessageRepository.findByTenantId(tenantId);  
         assertEquals("message is retrieved properly","helloText",message.getMessage());
     }

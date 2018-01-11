@@ -85,13 +85,14 @@ public class SmsApiResource {
         smsMessageService.validateMessageAndDestination(to,body); 
         Message message = new Message();
         message.setTo(to);
-        message.setId(apiKey); 
+        message.setApiMessageId(apiKey);
         message.setAccepted();  
         message.setBody(body); 
         List<String> individualNumbers = Arrays.asList(to.split(","));
-        for (String number : individualNumbers) { 
-            smsDeliver.send(body,number); 
+        for (String number : individualNumbers) {
+            smsDeliver.send(body,number);
             smsMessageService.saveSMS(apiKey,number,body);
+            //smsDeliver.send(body,number);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
     }  
@@ -114,12 +115,12 @@ public class SmsApiResource {
         smsMessageService.validateMessageAndDestination(numbers,body); 
         Message message = new Message();
         message.setTo(numbers);
-        message.setId(apiKey);
+        message.setApiMessageId(apiKey);
         message.setAccepted();
         message.setBody(body);
         List<String> individualNumbers = Arrays.asList(numbers.split(","));
-        for (String number : individualNumbers) { 
-            smsDeliver.send(body,number); 
+        for (String number : individualNumbers) {
+            smsDeliver.send(body,number);
             smsMessageService.saveSMS(apiKey,number,body);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);

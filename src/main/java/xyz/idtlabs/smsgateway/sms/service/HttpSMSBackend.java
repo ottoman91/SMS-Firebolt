@@ -22,7 +22,7 @@ import xyz.idtlabs.smsgateway.sms.domain.Message;
 import org.springframework.stereotype.Service; 
 import okhttp3.HttpUrl;
 
-@Service
+
 public interface HttpSMSBackend { 
 
     HttpUrl buildRequest(String message, String number);  

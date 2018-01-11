@@ -65,6 +65,13 @@ CREATE TABLE m_sms_bridge_configuration (
   CONSTRAINT `m_provider_configuration_1` FOREIGN KEY (`sms_bridge_id`) REFERENCES `m_sms_bridge` (`id`)
 );
 
+CREATE TABLE m_batch_messages (
+  id                      BIGINT(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  submitted_on_date       TIMESTAMP                                    NULL DEFAULT NULL,
+  tenant_id             BIGINT(20)                                    NOT NULL,
+  CONSTRAINT `m_batch_messages_configuration_1` FOREIGN KEY (`tenant_id`) REFERENCES `m_tenants` (`id`)
+);
+
 
 
 

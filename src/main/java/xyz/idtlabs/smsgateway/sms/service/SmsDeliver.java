@@ -25,4 +25,5 @@ public interface SmsDeliver{
 
     
     void send(String message, String number);
+
 }

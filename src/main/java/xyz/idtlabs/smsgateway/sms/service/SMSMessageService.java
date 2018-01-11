@@ -223,12 +223,14 @@ public class SMSMessageService {
 	}  
 
 	public void saveSMS(final String apiKey, final String to, final String body){
-		Tenant tenant = this.securityService.authenticate(apiKey) ;  
-		long tenantId = tenant.getId(); 
+		Tenant tenant = this.securityService.authenticate(apiKey) ;
+		long tenantId = tenant.getId();
 		Date currentDate = new Date();
 		SMSMessage smsMessage = new SMSMessage(tenantId,to,currentDate,body);
 		this.smsOutboundMessageRepository.save(smsMessage);
 	}
+
+
 
 	public Page<SMSMessage> findMessagesByTenantId(final Long tenantId, final int page, final int size ){
 		Page<SMSMessage> smsMessages = this.smsOutboundMessageRepository.findAllByTenantId(tenantId, new PageRequest(page, size));
