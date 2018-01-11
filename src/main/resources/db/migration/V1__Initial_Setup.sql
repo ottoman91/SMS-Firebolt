@@ -27,6 +27,11 @@ CREATE TABLE m_tenants (
 
 CREATE INDEX by_api_key on m_tenants (`api_key`);
 
+CREATE TABLE m_batch_messages (
+  id                      BIGINT(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  submitted_on_date       TIMESTAMP                                    NULL DEFAULT NULL
+);
+
 CREATE TABLE m_sms_bridge (
   id                      BIGINT(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
   tenant_id               BIGINT(20)                                      NOT NULL,
@@ -43,6 +48,7 @@ CREATE TABLE m_sms_bridge (
 CREATE TABLE m_outbound_messages (
   id                      BIGINT(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
   tenant_id               BIGINT(20)                                     NOT NULL,
+  batch_id                BIGINT(20)                                     NOT NULL,
   external_id             VARCHAR(100)                                    NULL DEFAULT NULL,
   internal_id             VARCHAR(100)                                    NULL DEFAULT NULL,
   delivery_error_message  VARCHAR(500)                                    NULL DEFAULT NULL,
@@ -54,7 +60,8 @@ CREATE TABLE m_outbound_messages (
   delivery_status       TINYINT(3)                                        NULL DEFAULT 100,
   message             VARCHAR(4096)                                   NOT NULL,
   CONSTRAINT `m_outbound_messages_1` FOREIGN KEY (`sms_bridge_id`) REFERENCES `m_sms_bridge` (`id`),
-  CONSTRAINT `m_outbound_messages_2` FOREIGN KEY (`tenant_id`) REFERENCES `m_tenants` (`id`)
+  CONSTRAINT `m_outbound_messages_2` FOREIGN KEY (`tenant_id`) REFERENCES `m_tenants` (`id`),
+  CONSTRAINT `m_outbound_messages_3` FOREIGN KEY (`batch_id`) REFERENCES `m_batch_messages` (`id`)
 );
 
 CREATE TABLE m_sms_bridge_configuration (
@@ -65,12 +72,7 @@ CREATE TABLE m_sms_bridge_configuration (
   CONSTRAINT `m_provider_configuration_1` FOREIGN KEY (`sms_bridge_id`) REFERENCES `m_sms_bridge` (`id`)
 );
 
-CREATE TABLE m_batch_messages (
-  id                      BIGINT(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  submitted_on_date       TIMESTAMP                                    NULL DEFAULT NULL,
-  tenant_id             BIGINT(20)                                    NOT NULL,
-  CONSTRAINT `m_batch_messages_configuration_1` FOREIGN KEY (`tenant_id`) REFERENCES `m_tenants` (`id`)
-);
+
 
 
 

@@ -30,11 +30,16 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
+import xyz.idtlabs.smsgateway.sms.domain.BatchMessages;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
+import xyz.idtlabs.smsgateway.sms.service.BatchMessagesService;
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
+
+import java.util.Date;
+
 import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection.H2;
 
 @RunWith(SpringRunner.class)
@@ -48,7 +53,10 @@ public class SmsMessageServiceDataJpaTest {
 	private SMSMessageService smsMessageService;
 	
 	@Autowired
-	private TenantRepository tenantRepository;  
+	private TenantRepository tenantRepository;
+
+	@Autowired
+    private BatchMessagesService batchMessagesService;
 	
 	@Autowired 
 	private SmsOutboundMessageRepository smsOutboundMessageRepository;
@@ -67,7 +75,11 @@ public class SmsMessageServiceDataJpaTest {
         assertEquals("client record stored successfully",testClient.getName(),retrievedClient.getName());   
         String apiKey = retrievedClient.getApiKey();
         Long tenantId = retrievedClient.getId();
-        smsMessageService.saveSMS(apiKey, "+23277775775", "helloText");
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
+        smsMessageService.saveSMS(apiKey, "+23277775775", "helloText",batchId);
         SMSMessage message = smsOutboundMessageRepository.findByTenantId(tenantId);  
         assertEquals("message is retrieved properly","helloText",message.getMessage());
     }

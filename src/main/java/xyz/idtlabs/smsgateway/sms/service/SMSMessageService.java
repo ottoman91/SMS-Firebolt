@@ -222,11 +222,11 @@ public class SMSMessageService {
 		}
 	}  
 
-	public void saveSMS(final String apiKey, final String to, final String body){
+	public void saveSMS(final String apiKey, final String to, final String body,final long batchId){
 		Tenant tenant = this.securityService.authenticate(apiKey) ;
 		long tenantId = tenant.getId();
 		Date currentDate = new Date();
-		SMSMessage smsMessage = new SMSMessage(tenantId,to,currentDate,body);
+		SMSMessage smsMessage = new SMSMessage(tenantId,to,currentDate,body,batchId);
 		this.smsOutboundMessageRepository.save(smsMessage);
 	}
 

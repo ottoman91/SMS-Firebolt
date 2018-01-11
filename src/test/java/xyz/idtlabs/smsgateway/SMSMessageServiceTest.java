@@ -36,6 +36,7 @@ import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
 import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
+import xyz.idtlabs.smsgateway.sms.service.BatchMessagesService;
 import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
@@ -68,6 +69,8 @@ public class SMSMessageServiceTest {
     @Autowired
     private SmsOutboundMessageRepository smsOutboundMessageRepository;
 
+    @Autowired
+    private BatchMessagesService batchMessagesService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -188,8 +191,13 @@ public class SMSMessageServiceTest {
         Arrays.fill(chars2,'b');
         String message2 = new String(chars2);
         String number = "+23277775775";
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message2);
+        String apiKey = tenantRepository.findByName("testClient").getApiKey();
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message2,batchId);
         Page<SMSMessage> smsMessage = smsMessageService.findMessagesByTenantId(savedTestClient.getId(),0,2);
         assertEquals("Messages sent by client not retrieved",2,smsMessage.getTotalElements());
     }
@@ -204,7 +212,11 @@ public class SMSMessageServiceTest {
         Arrays.fill(chars,'a');
         String message1 = new String(chars);
         String number = "+23277775775";
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1);
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId);
         long messageId = smsOutboundMessageRepository.findByTenantId(savedTestClient.getId()).getId();
         SMSMessage smsMessage = smsMessageService.findMessageByTenantIdAndId(savedTestClient.getId(),messageId);
         assertEquals("Unable to retrieve single message sent by client ",message1,smsMessage.getMessage());
@@ -243,8 +255,12 @@ public class SMSMessageServiceTest {
         String message1 = new String(chars2);
 
         String number = "+23277775775";
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1);
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message,batchId);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId);
 
 
         int numberOfMessagesSent = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(savedTestClient.getId(),

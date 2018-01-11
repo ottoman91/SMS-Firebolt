@@ -28,38 +28,28 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "m_batch_messages")
-public class Batch extends AbstractPersistableCustom<Long> {
+public class BatchMessages extends AbstractPersistableCustom<Long> {
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    @Column(name = "tenant_id", nullable = false)
-    private Long tenantId;
 
     @Column(name = "submitted_on_date", nullable = true)
-    @Temporal(TemporalType.DATE)
-    private Date submittedOnDate;
+    private String submittedOnDate;
 
-    protected Batch() {
+    protected BatchMessages() {
 
     }
 
-    public Batch (final Long tenantId, final Date submittedOnDate){
-        this.tenantId = tenantId;
+    public BatchMessages( final String submittedOnDate){
         this.submittedOnDate = submittedOnDate;
     }
 
-    public Long getTenantId(){
-        return tenantId;
-    }
 
-    public Date getSubmittedOnDate(){
+
+    public String getSubmittedOnDate(){
         return submittedOnDate;
     }
 
-    public void setTenantId(Long tenantId){
-        this.tenantId = tenantId;
-    }
 
-    public void setSubmittedOnDate(Date submittedOnDate){
+    public void setSubmittedOnDate(String submittedOnDate){
         this.submittedOnDate = submittedOnDate;
     }
 }

@@ -19,6 +19,7 @@
 package xyz.idtlabs.smsgateway.sms.api;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Arrays;
 
@@ -31,7 +32,8 @@ import xyz.idtlabs.smsgateway.helpers.PlatformApiInvalidParameterExceptionMapper
 import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
 import xyz.idtlabs.smsgateway.sms.domain.Message;
 import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
-import xyz.idtlabs.smsgateway.sms.service.SMSMessageService; 
+import xyz.idtlabs.smsgateway.sms.service.BatchMessagesService;
+import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
 import xyz.idtlabs.smsgateway.sms.service.SmsDeliver; 
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,13 +63,16 @@ public class SmsApiResource {
 	//This class sends TRANSACTIONAL & PROMOTIONAL SMS
 	private SMSMessageService smsMessageService ;
     private TenantsService tenantService;
+    private BatchMessagesService batchMessagesService;
     private static final Logger logger = LoggerFactory.getLogger(SMSMessageService.class);
 
 	
 	@Autowired
-    public SmsApiResource(final SMSMessageService smsMessageService, final TenantsService tenantService) {
+    public SmsApiResource(final SMSMessageService smsMessageService, final TenantsService tenantService,
+                          final BatchMessagesService batchMessagesService) {
 		this.smsMessageService = smsMessageService ; 
         this.tenantService = tenantService;
+        this.batchMessagesService = batchMessagesService;
     }  
 
     @Autowired
@@ -89,9 +94,13 @@ public class SmsApiResource {
         message.setAccepted();  
         message.setBody(body); 
         List<String> individualNumbers = Arrays.asList(to.split(","));
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
         for (String number : individualNumbers) {
             smsDeliver.send(body,number);
-            smsMessageService.saveSMS(apiKey,number,body);
+            smsMessageService.saveSMS(apiKey,number,body,batchId);
             //smsDeliver.send(body,number);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
@@ -119,9 +128,13 @@ public class SmsApiResource {
         message.setAccepted();
         message.setBody(body);
         List<String> individualNumbers = Arrays.asList(numbers.split(","));
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
         for (String number : individualNumbers) {
             smsDeliver.send(body,number);
-            smsMessageService.saveSMS(apiKey,number,body);
+            smsMessageService.saveSMS(apiKey,number,body,batchId);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
     }
