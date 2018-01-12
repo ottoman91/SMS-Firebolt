@@ -53,6 +53,11 @@ public interface SmsOutboundMessageRepository extends JpaRepository<SMSMessage, 
 
 
     SMSMessage findByTenantId(Long tenantId);
+
+    SMSMessage findByTenantIdAndMessageAndBatchIdAndMobileNumber(@Param("tenantId") final Long tenantId,
+																 @Param("message") final String message,
+																 @Param("batchId") final Long batchId,
+																 @Param("mobileNumber") final String number);
 	
 	/** 
 	 * find {@link SmsMessageStatusType} objects with id in "idList" and mifosTenantIdentifier equal to "mifosTenantIdentifier"

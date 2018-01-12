@@ -99,8 +99,8 @@ public class SmsApiResource {
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
         for (String number : individualNumbers) {
-            smsDeliver.send(body,number);
             smsMessageService.saveSMS(apiKey,number,body,batchId);
+            smsDeliver.send(body,number,batchId,apiKey);
             //smsDeliver.send(body,number);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
@@ -133,8 +133,8 @@ public class SmsApiResource {
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
         for (String number : individualNumbers) {
-            smsDeliver.send(body,number);
             smsMessageService.saveSMS(apiKey,number,body,batchId);
+            smsDeliver.send(body,number,batchId,apiKey);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
     }

@@ -57,7 +57,7 @@ CREATE TABLE m_outbound_messages (
   mobile_number           VARCHAR(255)                                    NOT NULL,
   submitted_on_date       TIMESTAMP                                       NOT NULL,
   delivered_on_date       TIMESTAMP                                       NULL DEFAULT NULL,
-  delivery_status       TINYINT(3)                                        NULL DEFAULT 100,
+  delivery_status       TINYINT(3) unsigned                                        NULL DEFAULT 100,
   message             VARCHAR(4096)                                   NOT NULL,
   CONSTRAINT `m_outbound_messages_1` FOREIGN KEY (`sms_bridge_id`) REFERENCES `m_sms_bridge` (`id`),
   CONSTRAINT `m_outbound_messages_2` FOREIGN KEY (`tenant_id`) REFERENCES `m_tenants` (`id`),

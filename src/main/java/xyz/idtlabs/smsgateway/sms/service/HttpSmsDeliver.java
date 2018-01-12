@@ -30,6 +30,8 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.Override;
+import xyz.idtlabs.smsgateway.sms.util.SmsMessageStatusType;
+
 
 @Service
 public class HttpSmsDeliver implements SmsDeliver {  
@@ -39,20 +41,24 @@ public class HttpSmsDeliver implements SmsDeliver {
     @Autowired 
     HttpSMSBackend httpSMSBackend;
 
-
-
+    @Autowired
+    SMSMessageService smsMessageService;
 
     @Override
-    public void send(String message, String number){
+    public void send(String message, String number,Long batchId,String apiKey){
         HttpUrl sendMessageUrl = httpSMSBackend.buildRequest(message, number);
         OkHttpClient client = new OkHttpClient(); 
         Request request = new Request.Builder().url(sendMessageUrl).build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override public void onFailure(Call call, IOException e) {
+                smsMessageService.updateMessageDeliveryStatus(message.toString(),number.toString(),
+                        batchId.longValue(),apiKey.toString(),SmsMessageStatusType.FAILED.getValue().intValue());
                 logger.error("Could not deliver following SMS to Backend: "+ message.toString(),e);
             } 
             @Override public void onResponse(Call call, Response response) throws IOException {
+                smsMessageService.updateMessageDeliveryStatus(message.toString(),number.toString(),
+                        batchId.longValue(),apiKey.toString(),SmsMessageStatusType.DELIVERED.getValue().intValue());
                 logger.info("Message Delivered To Backend" + message.toString());
             }
     });

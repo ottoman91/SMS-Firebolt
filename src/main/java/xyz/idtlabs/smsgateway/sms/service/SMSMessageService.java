@@ -230,6 +230,17 @@ public class SMSMessageService {
 		this.smsOutboundMessageRepository.save(smsMessage);
 	}
 
+	public void updateMessageDeliveryStatus(final String body,final String to, final Long batchId,final String apiKey,
+											final Integer messageDeliveryStatus){
+		Tenant tenant = this.securityService.authenticate(apiKey);
+		long tenantId = tenant.getId();
+		SMSMessage smsMessage = this.smsOutboundMessageRepository.findByTenantIdAndMessageAndBatchIdAndMobileNumber(
+				tenantId,body,batchId,to);
+		smsMessage.setDeliveryStatus(messageDeliveryStatus);
+		this.smsOutboundMessageRepository.save(smsMessage);
+
+	}
+
 
 
 	public Page<SMSMessage> findMessagesByTenantId(final Long tenantId, final int page, final int size ){

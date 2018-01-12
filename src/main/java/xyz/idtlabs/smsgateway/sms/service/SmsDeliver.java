@@ -18,12 +18,10 @@
  */
 package xyz.idtlabs.smsgateway.sms.service;
 
-import xyz.idtlabs.smsgateway.sms.domain.Message;
-
 
 public interface SmsDeliver{   
 
     
-    void send(String message, String number);
+    void send(String message, String number,Long batchId,String apiKey);
 
 }

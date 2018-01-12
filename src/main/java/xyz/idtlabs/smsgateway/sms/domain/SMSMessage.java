@@ -51,7 +51,7 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	private Date deliveredOnDate;
 
 	@Column(name = "delivery_status", nullable = false)
-	private Integer deliveryStatus = SmsMessageStatusType.PENDING.getValue();
+	private Integer deliveryStatus = SmsMessageStatusType.PENDING.getValue().intValue();
 
 	@Column(name = "delivery_error_message", nullable = true)
 	private String deliveryErrorMessage;
@@ -200,7 +200,7 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	}
 	
 	public Integer getDeliveryStatus() {
-		return this.deliveryStatus ;
+		return this.deliveryStatus.intValue() ;
 	}
 	
 	@Override

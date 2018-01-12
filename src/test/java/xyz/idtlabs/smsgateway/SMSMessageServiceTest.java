@@ -19,15 +19,20 @@
 
 package xyz.idtlabs.smsgateway;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -36,8 +41,7 @@ import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
 import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException;
 import xyz.idtlabs.smsgateway.sms.domain.SMSMessage;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
-import xyz.idtlabs.smsgateway.sms.service.BatchMessagesService;
-import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
+import xyz.idtlabs.smsgateway.sms.service.*;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
@@ -47,6 +51,8 @@ import java.util.Date;
 
 import java.util.Arrays;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection.H2;
 
@@ -56,6 +62,38 @@ import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnec
 @AutoConfigureTestDatabase(connection = H2)
 
 public class SMSMessageServiceTest {
+
+    //testing
+    @Configuration
+    static class EmployeeServiceImplTestContextConfiguration {
+
+        @Value("${kannel.url}")
+        String kannelUrl;
+
+        @Value("${kannel.username}")
+        String kannelUserName;
+
+        @Value("${kannel.password}")
+        String kannelPassword;
+
+        @Value("#{new Integer('${kannel.port}')}")
+        int kannelPort;
+
+
+        @Bean
+        public SmsDeliver smsDeliver() {
+            return new HttpSmsDeliver();
+        }
+        @Bean
+        public HttpSMSBackend httpSmsBackend(){
+            return new KannelBackend(kannelUrl,kannelPort,kannelUserName,kannelPassword);
+        }
+
+    }
+
+    //testing
+    @Autowired
+    private SmsDeliver smsDeliver;
 
 
     @Autowired
@@ -75,10 +113,32 @@ public class SMSMessageServiceTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    //testing
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8099));
+
+
     @After
     public void tearDown() throws Exception {
         tenantRepository.deleteAll();
         smsOutboundMessageRepository.deleteAll();
+    }
+
+    //testing
+    @Test
+    public void sendMessageToKannelBackend(){
+
+
+        wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
+                .withQueryParam("username",equalTo("kannel"))
+                .withQueryParam("password", equalTo("kannel"))
+                .withQueryParam("to", equalTo("123456"))
+                .withQueryParam("text", equalTo("testMessage"))
+                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+
+        smsDeliver.send("testMessage","123456",1L,"testKey");
+
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?username=kannel&password=kannel&to=123456&text=testMessage")));
     }
 
     @Test
