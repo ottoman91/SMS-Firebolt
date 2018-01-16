@@ -20,6 +20,10 @@
 package xyz.idtlabs.smsgateway;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -132,13 +136,13 @@ public class SMSMessageServiceTest {
         wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
                 .withQueryParam("username",equalTo("kannel"))
                 .withQueryParam("password", equalTo("kannel"))
-                .withQueryParam("to", equalTo("123456"))
+                .withQueryParam("to", equalTo("+23277775775"))
                 .withQueryParam("text", equalTo("testMessage"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-        smsDeliver.send("testMessage","123456",1L,"testKey");
+        smsDeliver.send("testMessage","+23277775775",1L,"testKey");
 
-        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?username=kannel&password=kannel&to=123456&text=testMessage")));
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
     }
 
     @Test
@@ -328,6 +332,8 @@ public class SMSMessageServiceTest {
 
         assertEquals("Messages between specific dates were not recovered",2,numberOfMessagesSent);
     }
+
+
 
 
 }

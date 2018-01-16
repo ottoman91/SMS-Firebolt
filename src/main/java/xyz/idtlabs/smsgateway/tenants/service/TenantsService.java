@@ -77,7 +77,7 @@ public class TenantsService {
 		}
 		return tenant ;
 	}
-	
+
 	public Tenant findTenantById(final long id) {
 		Tenant tenant = this.tenantRepository.findById(id) ;
 		if(tenant == null) {

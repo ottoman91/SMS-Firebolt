@@ -64,8 +64,8 @@ public class TenantsServiceTest {
 	}
 
 	@Test
-	@WithMockUser(roles={"ADMIN"})
-	public void createTenant_FailWhenNewClientNameOrDisplayNameNotCreated() {
+    @WithMockUser(roles = {"ADMIN"})
+    public void createTenant_FailWhenNewClientNameOrDisplayNameNotCreated() {
 
 		Tenant testClient = new Tenant("defaultApiKey","testClient", "testClientDisplay");
 		Tenant savedTestClient = tenantService.createTenant(testClient);
