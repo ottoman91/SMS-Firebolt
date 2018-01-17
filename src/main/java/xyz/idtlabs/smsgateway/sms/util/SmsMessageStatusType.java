@@ -23,11 +23,11 @@ package xyz.idtlabs.smsgateway.sms.util;
  **/
 public enum SmsMessageStatusType {
 	INVALID(0, "smsMessageStatusType.invalid"), // unknown status type
-    PENDING(50, "smsMessageStatusType.pending"), // message received
-    WAITING_FOR_REPORT(100, "smsMessageStatusType.pending"),
-    SENT(150, "smsMessageStatusType.sent"), // message sent to the SMS gateway
-    DELIVERED(200, "smsMessageStatusType.delivered"), // SMS gateway's attempt to deliver message to recipient's phone was successful
-    FAILED(225, "smsMessageStatusType.failed"); // SMS gateway's attempt to deliver message to recipient's phone failed
+    PENDING(20, "smsMessageStatusType.pending"), // message received
+    WAITING_FOR_REPORT(40, "smsMessageStatusType.pending"),
+    SENT(60, "smsMessageStatusType.sent"), // message sent to the SMS gateway
+    DELIVERED(80, "smsMessageStatusType.delivered"), // SMS gateway's attempt to deliver message to recipient's phone was successful
+    FAILED(100, "smsMessageStatusType.failed"); // SMS gateway's attempt to deliver message to recipient's phone failed
 	
 	private final Integer value;
     private final String code;

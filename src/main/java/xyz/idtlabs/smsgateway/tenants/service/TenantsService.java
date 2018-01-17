@@ -78,6 +78,7 @@ public class TenantsService {
 		return tenant ;
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	public Tenant findTenantById(final long id) {
 		Tenant tenant = this.tenantRepository.findById(id) ;
 		if(tenant == null) {

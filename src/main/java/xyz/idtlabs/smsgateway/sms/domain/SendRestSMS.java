@@ -31,9 +31,11 @@ public class SendRestSMS {
 
     private List<String> to; 
 
-    SendRestSMS(){
+    public SendRestSMS(){
         this.to = new ArrayList<>();
     }
+
+
 
 
   
