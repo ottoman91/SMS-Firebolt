@@ -20,8 +20,7 @@ package xyz.idtlabs.smsgateway.sms.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,17 +58,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service; 
-import java.util.List; 
+import org.springframework.stereotype.Service;
+
 import java.util.Date;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections; 
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher; 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Locale;
+
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber; 
@@ -101,7 +98,10 @@ public class SMSMessageService {
 	private String errorCode;   
 
 	private String countryCodes;
- 	
+
+	@Value("classpath:config.properties")
+	private Resource smsCentreProperties;
+
 	@Autowired
 	public SMSMessageService(final SmsOutboundMessageRepository smsOutboundMessageRepository,
 			final SMSProviderFactory smsProviderFactory,
@@ -222,11 +222,12 @@ public class SMSMessageService {
 		}
 	}  
 
-	public void saveSMS(final String apiKey, final String to, final String body,final long batchId){
+	public void saveSMS(final String apiKey, final String to, final String body,final long batchId,
+						final String smsCentreNumber){
 		Tenant tenant = this.securityService.authenticate(apiKey) ;
 		long tenantId = tenant.getId();
 		Date currentDate = new Date();
-		SMSMessage smsMessage = new SMSMessage(tenantId,to,currentDate,body,batchId);
+		SMSMessage smsMessage = new SMSMessage(tenantId,to,currentDate,body,batchId,smsCentreNumber);
 		this.smsOutboundMessageRepository.save(smsMessage);
 	}
 
@@ -373,9 +374,6 @@ public class SMSMessageService {
 	}
 
 
-	
-
-
 	public void validateMessageAndDestination(final String number, final String message){
 
 		checkForEmptyMessage(message);
@@ -384,6 +382,37 @@ public class SMSMessageService {
 		checkForDuplicateNumbers(number); 
 		validateNumber(number);
 
+	}
+
+	public String retrieveSmsCentreNumber(final String number){
+
+		Properties properties = new Properties();
+
+		try{
+			properties.load(smsCentreProperties.getInputStream());
+		}catch(IOException e){
+			logger.error("Parsing error while reading sms centre values from configuration file",e.toString());
+		}
+
+		List<String> codes = Arrays.asList(countryCodes.split(","));
+		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		PhoneNumber clientNumber = new PhoneNumber();
+		PhoneNumberToCarrierMapper phoneToCarrier = PhoneNumberToCarrierMapper.getInstance();
+		String carrierName = "";
+
+		for(String code:codes){
+			try{
+				clientNumber = phoneUtil.parse(number,code);
+				if(phoneUtil.isValidNumber(clientNumber)){
+					carrierName = phoneToCarrier.getNameForNumber(clientNumber,Locale.ENGLISH);
+				}
+			}catch (NumberParseException n){
+				logger.error("Number parsing error",n.toString());
+			}
+		}
+
+		String smsCentreNumber = properties.getProperty(carrierName);
+		return smsCentreNumber;
 	}
 
 

@@ -45,8 +45,8 @@ public class HttpSmsDeliver implements SmsDeliver {
     SMSMessageService smsMessageService;
 
     @Override
-    public void send(String message, String number,Long batchId,String apiKey){
-        HttpUrl sendMessageUrl = httpSMSBackend.buildRequest(message, number);
+    public void send(String message, String number,Long batchId,String apiKey,String smsCentreNumber){
+        HttpUrl sendMessageUrl = httpSMSBackend.buildRequest(message, number,smsCentreNumber);
         OkHttpClient client = new OkHttpClient(); 
         Request request = new Request.Builder().url(sendMessageUrl).build();
         Call call = client.newCall(request);

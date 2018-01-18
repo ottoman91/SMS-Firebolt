@@ -99,9 +99,9 @@ public class SmsApiResource {
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
         for (String number : individualNumbers) {
-            smsMessageService.saveSMS(apiKey,number,body,batchId);
-            smsDeliver.send(body,number,batchId,apiKey);
-            //smsDeliver.send(body,number);
+            String smsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+            smsMessageService.saveSMS(apiKey,number,body,batchId,smsCentreNumber);
+            smsDeliver.send(body,number,batchId,apiKey,smsCentreNumber);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
     }  
@@ -133,8 +133,9 @@ public class SmsApiResource {
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
         for (String number : individualNumbers) {
-            smsMessageService.saveSMS(apiKey,number,body,batchId);
-            smsDeliver.send(body,number,batchId,apiKey);
+            String smsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+            smsMessageService.saveSMS(apiKey,number,body,batchId,smsCentreNumber);
+            smsDeliver.send(body,number,batchId,apiKey,smsCentreNumber);
         }
         return new ResponseEntity<Message>(message,HttpStatus.OK);
     }

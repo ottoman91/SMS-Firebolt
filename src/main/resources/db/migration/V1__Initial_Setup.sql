@@ -49,6 +49,7 @@ CREATE TABLE m_outbound_messages (
   id                      BIGINT(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
   tenant_id               BIGINT(20)                                     NOT NULL,
   batch_id                BIGINT(20)                                     NOT NULL,
+  sms_centre_number       VARCHAR(100)                                   NULL DEFAULT NULL,
   external_id             VARCHAR(100)                                    NULL DEFAULT NULL,
   internal_id             VARCHAR(100)                                    NULL DEFAULT NULL,
   delivery_error_message  VARCHAR(500)                                    NULL DEFAULT NULL,

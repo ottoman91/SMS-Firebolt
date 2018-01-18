@@ -19,7 +19,8 @@
 package xyz.idtlabs.smsgateway.sms.service;
 
 import okhttp3.HttpUrl;
-import org.springframework.stereotype.Service; 
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -36,6 +37,8 @@ public class KannelBackend implements HttpSMSBackend {
     private final String userName;
     private final String password;
     private final int port;
+
+
 
     @Autowired
     public KannelBackend(
@@ -55,12 +58,12 @@ public class KannelBackend implements HttpSMSBackend {
     }
 
     @Override
-    public HttpUrl buildRequest(String message, String number){ 
-        return createKannelUrl(message,number);
+    public HttpUrl buildRequest(String message, String number,String smsCentreNumber){
+        return createKannelUrl(message,number,smsCentreNumber);
     }  
 
     //function that creates the kannel URL from the message object passed to it
-    private HttpUrl createKannelUrl(String message, String number){    
+    private HttpUrl createKannelUrl(String message, String number,String smsCentreNumber){
        
 //        
 
@@ -70,7 +73,7 @@ public class KannelBackend implements HttpSMSBackend {
              .host(url)
              .port(port)
              .addPathSegment("cgi-bin")
-             .addPathSegment("sendsms")
+             .addPathSegment("sendsms").addQueryParameter("smsc",smsCentreNumber)
              .addQueryParameter("username", userName)
              .addQueryParameter("password", password)
              .addQueryParameter("to", number)

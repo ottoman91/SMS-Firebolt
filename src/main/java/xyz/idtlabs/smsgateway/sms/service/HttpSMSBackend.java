@@ -25,5 +25,5 @@ import okhttp3.HttpUrl;
 
 public interface HttpSMSBackend { 
 
-    HttpUrl buildRequest(String message, String number);  
+    HttpUrl buildRequest(String message, String number,String smsCentreNumber);
 }

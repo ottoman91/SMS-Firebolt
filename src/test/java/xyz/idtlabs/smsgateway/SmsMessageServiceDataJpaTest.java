@@ -79,7 +79,7 @@ public class SmsMessageServiceDataJpaTest {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
-        smsMessageService.saveSMS(apiKey, "+23277775775", "helloText",batchId);
+        smsMessageService.saveSMS(apiKey, "+23277775775", "helloText",batchId,"0");
         SMSMessage message = smsOutboundMessageRepository.findByTenantId(tenantId);  
         assertEquals("message is retrieved properly","helloText",message.getMessage());
     }

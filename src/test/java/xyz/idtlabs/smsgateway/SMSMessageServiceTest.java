@@ -134,15 +134,16 @@ public class SMSMessageServiceTest {
 
 
         wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
+                .withQueryParam("smsc",equalTo("1"))
                 .withQueryParam("username",equalTo("kannel"))
                 .withQueryParam("password", equalTo("kannel"))
                 .withQueryParam("to", equalTo("+23277775775"))
                 .withQueryParam("text", equalTo("testMessage"))
                 .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-        smsDeliver.send("testMessage","+23277775775",1L,"testKey");
+        smsDeliver.send("testMessage","+23277775775",1L,"testKey","1");
 
-        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
     }
 
     @Test
@@ -259,9 +260,10 @@ public class SMSMessageServiceTest {
         java.util.Date dt = new java.util.Date();
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = sdf.format(dt);
+        String defaultSmsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message2,batchId);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId,defaultSmsCentreNumber);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message2,batchId,defaultSmsCentreNumber);
         Page<SMSMessage> smsMessage = smsMessageService.findMessagesByTenantId(savedTestClient.getId(),0,2);
         assertEquals("Messages sent by client not retrieved",2,smsMessage.getTotalElements());
     }
@@ -280,7 +282,8 @@ public class SMSMessageServiceTest {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId);
+        String defaultSmsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId,defaultSmsCentreNumber);
         long messageId = smsOutboundMessageRepository.findByTenantId(savedTestClient.getId()).getId();
         SMSMessage smsMessage = smsMessageService.findMessageByTenantIdAndId(savedTestClient.getId(),messageId);
         assertEquals("Unable to retrieve single message sent by client ",message1,smsMessage.getMessage());
@@ -323,8 +326,9 @@ public class SMSMessageServiceTest {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = sdf.format(dt);
         Long batchId = batchMessagesService.returnBatchId(currentTime);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message,batchId);
-        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId);
+        String defaultSmsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message,batchId,defaultSmsCentreNumber);
+        smsMessageService.saveSMS(savedTestClient.getApiKey(),number,message1,batchId,defaultSmsCentreNumber);
 
 
         int numberOfMessagesSent = smsMessageService.showTotalMessagesSentBetweenDatesByTenant(savedTestClient.getId(),
@@ -332,6 +336,27 @@ public class SMSMessageServiceTest {
 
         assertEquals("Messages between specific dates were not recovered",2,numberOfMessagesSent);
     }
+
+    @Test
+    public void confirmSmsCentreNumberProperlyRetrievedForAfricell(){
+
+        String number = "+23277775775";
+        String smsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+        assertEquals("Sms Centre Number of Africell not retrieved properly","1",smsCentreNumber);
+
+    }
+
+    @Test
+    public void confirmSmsCentreNumberProperlyRetrievedForAirtell(){
+
+        String number = "+23278775775";
+        String smsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+        assertEquals("Sms Centre Number of Airtell not retrieved properly","2",smsCentreNumber);
+
+    }
+
+
+
 
 
 

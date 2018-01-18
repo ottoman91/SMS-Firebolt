@@ -71,6 +71,9 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	@Column(name = "batch_id", nullable = false)
 	private Long batchId;
 
+	@Column(name="sms_centre_number")
+	private String smsCentreNumber;
+
 	protected SMSMessage() {
 		
 	}
@@ -78,7 +81,8 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	private SMSMessage(final String externalId, final Long internalId, final Long tenantId,
 			final Date submittedOnDate, final Date deliveredOnDate,
 			final SmsMessageStatusType deliveryStatus, final String deliveryErrorMessage, final String sourceAddress,
-			final String mobileNumber, final String message, final Long bridgeId,final Long batchId) {
+			final String mobileNumber, final String message, final Long bridgeId,final Long batchId,
+					   final String smsCentreNumber) {
 		this.externalId = externalId;
 		this.internalId = internalId;
 		this.tenantId = tenantId;
@@ -91,15 +95,17 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 		this.message = message;
 		this.bridgeId = bridgeId;
 		this.batchId = batchId;
+		this.smsCentreNumber = smsCentreNumber;
 	} 
 
 	public SMSMessage(final long tenantId, final String mobileNumber, final Date submittedOnDate, final String message,
-					  final Long batchId){
+					  final Long batchId,final String smsCentreNumber){
 		this.tenantId = tenantId;
 		this.mobileNumber = mobileNumber;
 		this.submittedOnDate = submittedOnDate;
 		this.message = message;
 		this.batchId = batchId;
+		this.smsCentreNumber = smsCentreNumber;
 	}
 
 
@@ -107,11 +113,12 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	public static SMSMessage getPendingMessages(final String externalId, final Long internalId,
 			final Long tenantId, final Date submittedOnDate,
 			final Date deliveredOnDate, final String deliveryErrorMessage, final String sourceAddress,
-			final String mobileNumber, final String message, final Long providerId,final Long batchId) {
+			final String mobileNumber, final String message, final Long providerId,final Long batchId,
+												final String smsCentreNumber) {
 
 		return new SMSMessage(externalId, internalId, tenantId, submittedOnDate,
 				deliveredOnDate, SmsMessageStatusType.PENDING, deliveryErrorMessage, sourceAddress, mobileNumber,
-				message, providerId,batchId);
+				message, providerId,batchId,smsCentreNumber);
 	}
 
 	/**
@@ -120,11 +127,12 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	public SMSMessage getInstance(final String externalId, final Long internalId, final Long tenantId,
 			final Date submittedOnDate, final Date deliveredOnDate,
 			final SmsMessageStatusType deliveryStatus, final String deliveryErrorMessage, final String sourceAddress,
-			final String mobileNumber, final String message, final Long providerId,final Long batchId) {
+			final String mobileNumber, final String message, final Long providerId,final Long batchId,
+								  final String smsCentreNumber) {
 
 		return new SMSMessage(externalId, internalId, tenantId, submittedOnDate,
 				deliveredOnDate, deliveryStatus, deliveryErrorMessage, sourceAddress, mobileNumber, message,
-				providerId,batchId);
+				providerId,batchId,smsCentreNumber);
 	}
 
 	public Long getInternalId() {
@@ -202,7 +210,8 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	public Integer getDeliveryStatus() {
 		return this.deliveryStatus.intValue() ;
 	}
-	
+
+
 	@Override
     public String toString() {
         return "SmsOutboundMessage [externalId=" + externalId + ", internalId=" + internalId

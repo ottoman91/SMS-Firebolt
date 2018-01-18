@@ -22,7 +22,7 @@ package xyz.idtlabs.smsgateway.sms.util;
  * SMS message delivery status predefined enum constants
  **/
 public enum SmsMessageStatusType {
-	INVALID(0, "smsMessageStatusType.invalid"), // unknown status type
+	INVALID(10, "smsMessageStatusType.invalid"), // unknown status type
     PENDING(20, "smsMessageStatusType.pending"), // message received
     WAITING_FOR_REPORT(40, "smsMessageStatusType.pending"),
     SENT(60, "smsMessageStatusType.sent"), // message sent to the SMS gateway

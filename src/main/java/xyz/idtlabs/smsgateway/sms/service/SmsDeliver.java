@@ -22,6 +22,6 @@ package xyz.idtlabs.smsgateway.sms.service;
 public interface SmsDeliver{   
 
     
-    void send(String message, String number,Long batchId,String apiKey);
+    void send(String message, String number,Long batchId,String apiKey,String smsCentreId);
 
 }
