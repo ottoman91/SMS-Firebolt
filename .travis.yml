@@ -21,7 +21,11 @@ jdk: oraclejdk8
 services:
   - mysql
 
+before_script:
+  - mysql -e 'DROP DATABASE IF EXISTS messagegateway'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS messagegateway;'
+  - mysql -u root --default-character-set=utf8 messagegateway < src/main/resources/db/migration/V1__Initial_Setup.sql
+  - chmod -R 777 ./travis_build.sh
 
-before_script: chmod -R 777 ./travis_build.sh
 
 script: ./travis_build.sh
