@@ -20,7 +20,9 @@ package xyz.idtlabs.smsgateway.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.retry.annotation.EnableRetry;
 
+@EnableRetry
 @Configuration
 @Import({ MessageGatewayConfiguration.class, SpringConfiguringClass.class })
 public class SmsFireboltConfiguration { 

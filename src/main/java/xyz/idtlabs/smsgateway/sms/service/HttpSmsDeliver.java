@@ -18,7 +18,8 @@
  */
 package xyz.idtlabs.smsgateway.sms.service;
 
-import org.springframework.stereotype.Service; 
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
@@ -45,6 +46,7 @@ public class HttpSmsDeliver implements SmsDeliver {
     SMSMessageService smsMessageService;
 
     @Override
+    @Retryable(maxAttempts = 2)
     public void send(String message, String number,Long batchId,String apiKey,String smsCentreNumber){
         HttpUrl sendMessageUrl = httpSMSBackend.buildRequest(message, number,smsCentreNumber);
         OkHttpClient client = new OkHttpClient(); 

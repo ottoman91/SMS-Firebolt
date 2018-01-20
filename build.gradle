@@ -46,6 +46,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.flywaydb:flyway-core")
     compile('org.apache.velocity:velocity:1.7')
     compile('com.squareup.okhttp:okhttp:2.0.0')
@@ -66,6 +67,7 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'io.rest-assured:rest-assured:3.0.6'
     compile 'org.springframework.security:spring-security-test:5.0.0.RELEASE'
+    compile 'org.springframework.retry:spring-retry:1.2.2.RELEASE'
     testCompile("org.springframework.boot:spring-boot-starter-test")
     //testCompile('com.github.tomakehurst:wiremock:2.10.1')
     testCompile "com.github.tomakehurst:wiremock-standalone:2.10.1"
