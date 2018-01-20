@@ -39,6 +39,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import xyz.idtlabs.smsgateway.configuration.MessageGatewayConfiguration;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants;
 import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
@@ -51,7 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= MessageGatewayConfiguration.class,webEnvironment = WebEnvironment.RANDOM_PORT )
+@SpringBootTest(classes= SmsFireboltConfiguration.class,webEnvironment = WebEnvironment.RANDOM_PORT )
 @EnableAutoConfiguration
 @AutoConfigureTestDatabase(connection = H2)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
