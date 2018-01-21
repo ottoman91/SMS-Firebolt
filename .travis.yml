@@ -19,15 +19,16 @@ language: java
 jdk: oraclejdk8
 
 services:
-  - mysql
+  - docker
 
 sudo: true
 
+before_install:
+  - sudo service mysql stop || sudo service mysql-5.5 stop || sudo stop mysql-5.5 || sudo stop mysql || echo "failed to stop mysql"
+
+  - sudo docker run -d -p 3306:3306 mysql:5.5 # or whatever version mysql:5.6 mysql:5.5 mysql:5.8 or your custom mysql image
+
 before_script:
   - chmod -R 777 ./travis_build.sh
-  - bash .travis.install-mysql-5.7.sh
-  - mysql -e 'DROP DATABASE IF EXISTS messagegateway'
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS messagegateway;'
-  - mysql -u root messagegateway < src/main/resources/db/migration/V1__Initial_Setup.sql
 
 script: ./travis_build.sh
