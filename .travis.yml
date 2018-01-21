@@ -26,6 +26,9 @@ before_install:
 
   - sudo docker run -d -p 3306:3306 mysql:5.7 # or whatever version mysql:5.6 mysql:5.5 mysql:5.8 or your custom mysql image
 
+before_script:
+  - chmod -R 777 ./travis_build.sh
+
 
 
 
