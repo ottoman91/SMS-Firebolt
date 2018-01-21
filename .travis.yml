@@ -27,6 +27,7 @@ services:
 before_install:
   - sudo service mysql stop || sudo service mysql-5.5 stop || sudo stop mysql-5.5 || sudo stop mysql || echo "failed to stop mysql"
   - sudo docker run -d -p 3306:3306 mysql:5.5 # or whatever version mysql:5.6 mysql:5.5 mysql:5.8 or your custom mysql image
+  - mysql -h localhost -P 3306 --protocol=tcp
 
 
 before_script:
