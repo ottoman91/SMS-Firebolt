@@ -26,6 +26,8 @@ sudo: required
 before_script:
   - chmod -R 777 ./travis_build.sh
   - bash .travis.install-mysql-5.7.sh
+  - mysql -e 'DROP DATABASE IF EXISTS messagegateway'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS messagegateway;'
   - mysql -u root < src/main/resources/db/migration/V1__Initial_Setup.sql
 
 script: ./travis_build.sh
