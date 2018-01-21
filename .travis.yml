@@ -21,7 +21,7 @@ jdk: oraclejdk8
 services:
   - docker
 
-sudo: true
+sudo: required
 
 before_install:
   - sudo service mysql stop || sudo service mysql-5.5 stop || sudo stop mysql-5.5 || sudo stop mysql || echo "failed to stop mysql"
@@ -30,5 +30,6 @@ before_install:
 
 before_script:
   - chmod -R 777 ./travis_build.sh
+
 
 script: ./travis_build.sh
