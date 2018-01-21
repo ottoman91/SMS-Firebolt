@@ -24,7 +24,7 @@ services:
 before_install:
   - mysql -e 'DROP DATABASE IF EXISTS messagegateway'
   - mysql -e 'CREATE DATABASE IF NOT EXISTS messagegateway;'
-  - mysql -u root --password="mysql" messagegateway < src/main/resources/db/migration/V1__Initial_Setup.sql
+  - sudo mysql -uroot < src/main/resources/db/migration/V1__Initial_Setup.sql
 
 
 before_script: chmod -R 777 ./travis_build.sh

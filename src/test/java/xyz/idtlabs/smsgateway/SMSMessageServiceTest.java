@@ -67,37 +67,9 @@ import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnec
 
 public class SMSMessageServiceTest {
 
-    //testing
-    @Configuration
-    static class EmployeeServiceImplTestContextConfiguration {
-
-//        @Value("${kannel.url}")
-//        String kannelUrl;
-//
-//        @Value("${kannel.username}")
-//        String kannelUserName;
-//
-//        @Value("${kannel.password}")
-//        String kannelPassword;
-//
-//        @Value("#{new Integer('${kannel.port}')}")
-//        int kannelPort;
 
 
-//        @Bean
-//        public SmsDeliver smsDeliver() {
-//            return new HttpSmsDeliver();
-//        }
-//        @Bean
-//        public HttpSMSBackend httpSmsBackend(){
-//            return new KannelBackend(kannelUrl,kannelPort,kannelUserName,kannelPassword);
-//        }
 
-    }
-
-    //testing
-//    @Autowired
-//    private SmsDeliver smsDeliver;
 
 
     @Autowired
@@ -117,10 +89,6 @@ public class SMSMessageServiceTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    //testing
-//    @Rule
-//    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8099));
-
 
     @After
     public void tearDown() throws Exception {
@@ -128,23 +96,6 @@ public class SMSMessageServiceTest {
         smsOutboundMessageRepository.deleteAll();
     }
 
-    //testing
-//    @Test
-//    public void sendMessageToKannelBackend(){
-//
-//
-//        wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
-//                .withQueryParam("smsc",equalTo("1"))
-//                .withQueryParam("username",equalTo("kannel"))
-//                .withQueryParam("password", equalTo("kannel"))
-//                .withQueryParam("to", equalTo("+23277775775"))
-//                .withQueryParam("text", equalTo("testMessage"))
-//                .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-//
-//        smsDeliver.send("testMessage","+23277775775",1L,"testKey","1");
-//
-//        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
-//    }
 
     @Test
     public void validateMessageAndDestination_FailWhenErrorNotThrownForEmptyMessage(){
