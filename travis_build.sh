@@ -17,4 +17,4 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-./gradlew --info clean licenseMain licenseTest test
+./gradlew --info clean test
