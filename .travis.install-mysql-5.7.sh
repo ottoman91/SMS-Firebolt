@@ -5,4 +5,4 @@ sudo apt-get update -q
 sudo apt-get install -q -y --allow-unauthenticated -o Dpkg::Options::=--force-confnew mysql-server
 sudo mysql_upgrade -u root sudo service mysql restart
 sudo mysql -uroot -e 'create database messagegateway;'
-sudo mysql -uroot < src/main/resources/db/migration/V1__Initial_Setup.sql
+sudo mysql -uroot `messagegateway` < src/main/resources/db/migration/V1__Initial_Setup.sql
