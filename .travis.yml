@@ -18,10 +18,11 @@ language: java
 
 jdk: oraclejdk8
 
+sudo: required
+
 services:
   - docker
 
-sudo: required
 
 before_install:
   - sudo service mysql stop || sudo service mysql-5.5 stop || sudo stop mysql-5.5 || sudo stop mysql || echo "failed to stop mysql"
@@ -30,6 +31,9 @@ before_install:
 
 before_script:
   - chmod -R 777 ./travis_build.sh
+  - mysql -u root -e 'create database messagegateway;'
+  - mysql -u root messagegateway < "src/main/resources/db/migration/V1__Initial_Setup.sql"
+
 
 
 script: ./travis_build.sh
