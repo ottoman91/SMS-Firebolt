@@ -27,8 +27,6 @@ services:
 before_script:
   - bash .travis.install-mysql-5.7.sh
   - chmod -R 777 ./travis_build.sh
-  - mysql -uroot -e 'create database messagegateway;'
-  - mysql -uroot messagegateway < "src/main/resources/db/migration/V1__Initial_Setup.sql"
 
 
 
