@@ -18,31 +18,40 @@
  */
 package xyz.idtlabs.smsgateway;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection.H2;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import xyz.idtlabs.smsgateway.configuration.MessageGatewayConfiguration;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants;
 import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
 import xyz.idtlabs.smsgateway.sms.repository.SmsOutboundMessageRepository;
+import xyz.idtlabs.smsgateway.sms.service.*;
 import xyz.idtlabs.smsgateway.tenants.domain.Tenant;
 import xyz.idtlabs.smsgateway.tenants.repository.TenantRepository;
 import org.slf4j.Logger;
@@ -54,11 +63,13 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= SmsFireboltConfiguration.class,webEnvironment = WebEnvironment.RANDOM_PORT )
 @EnableAutoConfiguration
+@PropertySource("classpath:config.properties")
 @AutoConfigureTestDatabase(connection = H2)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SmsApiResourceEndPointIntegrationTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SmsApiResourceEndPointIntegrationTest.class);
+
 
     /** The port. */
     @LocalServerPort
@@ -69,6 +80,36 @@ public class SmsApiResourceEndPointIntegrationTest {
 
     @Autowired
     private SmsOutboundMessageRepository smsOutboundMessageRepository;
+
+    @Autowired
+    private SmsDeliver smsDeliver;
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8099));
+
+
+    /** Setting up stubs for Wiremock. */
+    public void setupStub(){
+        wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
+                .withQueryParam("smsc",equalTo("1"))
+                .withQueryParam("username",equalTo("kannel"))
+                .withQueryParam("password", equalTo("kannel"))
+                .withQueryParam("to", equalTo("+23277775775"))
+                .withQueryParam("text", equalTo("testMessage"))
+                .willReturn(aResponse().withStatus(org.springframework.http.HttpStatus.OK.value())));
+
+
+
+        wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
+                .withQueryParam("smsc",equalTo("1"))
+                .withQueryParam("username",equalTo("kannel"))
+                .withQueryParam("password", equalTo("kannel"))
+                .withQueryParam("to", equalTo("+23277773773"))
+                .withQueryParam("text", equalTo("testMessage"))
+        .willReturn(aResponse().withStatus(org.springframework.http.HttpStatus.OK.value())));
+    }
+
+
 
     @Before
     public void setup(){
@@ -82,6 +123,7 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void whenMessageAndNumberPassedCorrectlyForExistingTenant_return200(){
 
+        setupStub();
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
@@ -93,10 +135,14 @@ public class SmsApiResourceEndPointIntegrationTest {
                 basic("idtlabsuser","idtlabs");
 
         Response response = basicAuth.accept(ContentType.JSON).param("apiKey",apiKey).
-                param("to","+23277775775").param("body","hello").get("messages/http/send");
+                param("to","+23277775775").param("body","testMessage").
+                get("messages/http/send");
 
         assertEquals("All message details correctly passed and 200 status not returned",
                 HttpStatus.SC_OK,response.statusCode());
+
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
+
 
     }
 
@@ -116,6 +162,9 @@ public class SmsApiResourceEndPointIntegrationTest {
 
         assertEquals("For unauthorized user, 401 status code was not returned",
                 HttpStatus.SC_UNAUTHORIZED,response.statusCode());
+
+
+
     }
 
     @Test
@@ -175,6 +224,7 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void multipleVerifiedNumbersSentWithMessageInGetRequest_return200(){
 
+        setupStub();
         Tenant testClient = new Tenant("defaultApiKey4","defaultClient4",
                 "defaultClientDisplayName4");
 
@@ -190,10 +240,14 @@ public class SmsApiResourceEndPointIntegrationTest {
                 basic("idtlabsuser","idtlabs");
 
         Response response = basicAuth.accept(ContentType.JSON).param("apiKey",apiKey).
-                param("to",numbers).param("body","hello").get("messages/http/send");
+                param("to",numbers).param("body","testMessage").get("messages/http/send");
 
         assertEquals("Message sent with multiple numbers, 200 OK Status not shown",
                 HttpStatus.SC_OK,response.statusCode());
+
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277773773&text=testMessage")));
+
     }
 
     @Test
@@ -225,7 +279,7 @@ public class SmsApiResourceEndPointIntegrationTest {
 
     @Test
     public void singleNumberSentWithMessageInPostRequest_return200(){
-
+        setupStub();
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
@@ -236,7 +290,7 @@ public class SmsApiResourceEndPointIntegrationTest {
 
         SendRestSMS smsMessage = new SendRestSMS();
 
-        smsMessage.setBody("sampleText");
+        smsMessage.setBody("testMessage");
         smsMessage.setTo(numbers);
 
         RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
@@ -249,6 +303,9 @@ public class SmsApiResourceEndPointIntegrationTest {
 
         assertEquals("Single Number sent with message in Api Call, and 200 Status not returned",
                 HttpStatus.SC_OK,response.statusCode());
+
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
+
     }
 
 
@@ -340,6 +397,7 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void multipleVerifiedNumbersSentWithMessageInPostRequest_return200(){
 
+        setupStub();
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
@@ -350,7 +408,7 @@ public class SmsApiResourceEndPointIntegrationTest {
 
         SendRestSMS smsMessage = new SendRestSMS();
 
-        smsMessage.setBody("sampleText");
+        smsMessage.setBody("testMessage");
         smsMessage.setTo(numbers);
 
 
@@ -364,6 +422,9 @@ public class SmsApiResourceEndPointIntegrationTest {
 
         assertEquals("Multiple verified numbers sent with Api Call, and 200 Status not returned",
                 HttpStatus.SC_OK,response.statusCode());
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
+        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277773773&text=testMessage")));
+
     }
 
     @Test

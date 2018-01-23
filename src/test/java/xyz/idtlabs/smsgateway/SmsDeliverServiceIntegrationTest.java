@@ -72,8 +72,6 @@ public class SmsDeliverServiceIntegrationTest {
 
     }
 
-
-
     @Autowired
     private SmsDeliver smsDeliver;
 
