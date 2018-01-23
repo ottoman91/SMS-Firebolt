@@ -36,13 +36,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -89,15 +86,19 @@ public class SmsApiResourceEndPointIntegrationTest {
 
 
     /** Setting up stubs for Wiremock. */
-    public void setupStub(){
+    public void setupStub1() {
         wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
-                .withQueryParam("smsc",equalTo("1"))
-                .withQueryParam("username",equalTo("kannel"))
+                .withQueryParam("smsc", equalTo("1"))
+                .withQueryParam("username", equalTo("kannel"))
                 .withQueryParam("password", equalTo("kannel"))
                 .withQueryParam("to", equalTo("+23277775775"))
                 .withQueryParam("text", equalTo("testMessage"))
                 .willReturn(aResponse().withStatus(org.springframework.http.HttpStatus.OK.value())));
 
+    }
+
+
+    public void setupStub2(){
 
 
         wireMockRule.stubFor(get(urlPathMatching("/cgi-bin/sendsms"))
@@ -123,7 +124,7 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void whenMessageAndNumberPassedCorrectlyForExistingTenant_return200(){
 
-        setupStub();
+        setupStub1();
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
@@ -224,7 +225,8 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void multipleVerifiedNumbersSentWithMessageInGetRequest_return200(){
 
-        setupStub();
+        setupStub1();
+        setupStub2();
         Tenant testClient = new Tenant("defaultApiKey4","defaultClient4",
                 "defaultClientDisplayName4");
 
@@ -279,7 +281,7 @@ public class SmsApiResourceEndPointIntegrationTest {
 
     @Test
     public void singleNumberSentWithMessageInPostRequest_return200(){
-        setupStub();
+        setupStub1();
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
@@ -397,7 +399,9 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void multipleVerifiedNumbersSentWithMessageInPostRequest_return200(){
 
-        setupStub();
+        setupStub1();
+        setupStub2();
+
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
