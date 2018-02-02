@@ -16,19 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.configuration;
+package xyz.idtlabs.smsgateway.sms.service;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
 
-public class MessageGatewayInitializer extends SpringBootServletInitializer {
+public interface SmsDeliver{   
 
-    public MessageGatewayInitializer() {
-        super();
-    }
+    
+    void send(String message, String number,Long batchId,String apiKey,String smsCentreId);
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MessageGatewayConfiguration.class);
-    }
 }

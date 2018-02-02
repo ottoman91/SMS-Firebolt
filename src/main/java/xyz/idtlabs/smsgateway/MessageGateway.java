@@ -21,6 +21,7 @@ package xyz.idtlabs.smsgateway;
 import xyz.idtlabs.smsgateway.configuration.SmsFireboltConfiguration;
 import org.springframework.boot.SpringApplication;
 
+
 public class MessageGateway {
 
     public MessageGateway() {

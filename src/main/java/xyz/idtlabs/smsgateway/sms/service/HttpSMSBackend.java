@@ -16,19 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.configuration;
+package xyz.idtlabs.smsgateway.sms.service;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import xyz.idtlabs.smsgateway.sms.domain.Message;
+import org.springframework.stereotype.Service; 
+import okhttp3.HttpUrl;
 
-public class MessageGatewayInitializer extends SpringBootServletInitializer {
 
-    public MessageGatewayInitializer() {
-        super();
-    }
+public interface HttpSMSBackend { 
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MessageGatewayConfiguration.class);
-    }
+    HttpUrl buildRequest(String message, String number,String smsCentreNumber);
 }

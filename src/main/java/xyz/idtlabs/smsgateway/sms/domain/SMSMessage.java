@@ -51,7 +51,7 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	private Date deliveredOnDate;
 
 	@Column(name = "delivery_status", nullable = false)
-	private Integer deliveryStatus = SmsMessageStatusType.PENDING.getValue();
+	private Integer deliveryStatus = SmsMessageStatusType.PENDING.getValue().intValue();
 
 	@Column(name = "delivery_error_message", nullable = true)
 	private String deliveryErrorMessage;
@@ -68,6 +68,12 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	@Column(name = "sms_bridge_id", nullable = false)
 	private Long bridgeId;
 
+	@Column(name = "batch_id", nullable = false)
+	private Long batchId;
+
+	@Column(name="sms_centre_number")
+	private String smsCentreNumber;
+
 	protected SMSMessage() {
 		
 	}
@@ -75,7 +81,8 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	private SMSMessage(final String externalId, final Long internalId, final Long tenantId,
 			final Date submittedOnDate, final Date deliveredOnDate,
 			final SmsMessageStatusType deliveryStatus, final String deliveryErrorMessage, final String sourceAddress,
-			final String mobileNumber, final String message, final Long bridgeId) {
+			final String mobileNumber, final String message, final Long bridgeId,final Long batchId,
+					   final String smsCentreNumber) {
 		this.externalId = externalId;
 		this.internalId = internalId;
 		this.tenantId = tenantId;
@@ -87,23 +94,31 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 		this.mobileNumber = mobileNumber;
 		this.message = message;
 		this.bridgeId = bridgeId;
+		this.batchId = batchId;
+		this.smsCentreNumber = smsCentreNumber;
 	} 
 
-	public SMSMessage(final long tenantId, final String mobileNumber, final Date submittedOnDate, final String message){
+	public SMSMessage(final long tenantId, final String mobileNumber, final Date submittedOnDate, final String message,
+					  final Long batchId,final String smsCentreNumber){
 		this.tenantId = tenantId;
 		this.mobileNumber = mobileNumber;
 		this.submittedOnDate = submittedOnDate;
 		this.message = message;
+		this.batchId = batchId;
+		this.smsCentreNumber = smsCentreNumber;
 	}
+
+
 
 	public static SMSMessage getPendingMessages(final String externalId, final Long internalId,
 			final Long tenantId, final Date submittedOnDate,
 			final Date deliveredOnDate, final String deliveryErrorMessage, final String sourceAddress,
-			final String mobileNumber, final String message, final Long providerId) {
+			final String mobileNumber, final String message, final Long providerId,final Long batchId,
+												final String smsCentreNumber) {
 
 		return new SMSMessage(externalId, internalId, tenantId, submittedOnDate,
 				deliveredOnDate, SmsMessageStatusType.PENDING, deliveryErrorMessage, sourceAddress, mobileNumber,
-				message, providerId);
+				message, providerId,batchId,smsCentreNumber);
 	}
 
 	/**
@@ -112,11 +127,12 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	public SMSMessage getInstance(final String externalId, final Long internalId, final Long tenantId,
 			final Date submittedOnDate, final Date deliveredOnDate,
 			final SmsMessageStatusType deliveryStatus, final String deliveryErrorMessage, final String sourceAddress,
-			final String mobileNumber, final String message, final Long providerId) {
+			final String mobileNumber, final String message, final Long providerId,final Long batchId,
+								  final String smsCentreNumber) {
 
 		return new SMSMessage(externalId, internalId, tenantId, submittedOnDate,
 				deliveredOnDate, deliveryStatus, deliveryErrorMessage, sourceAddress, mobileNumber, message,
-				providerId);
+				providerId,batchId,smsCentreNumber);
 	}
 
 	public Long getInternalId() {
@@ -192,9 +208,10 @@ public class SMSMessage extends AbstractPersistableCustom<Long> {
 	}
 	
 	public Integer getDeliveryStatus() {
-		return this.deliveryStatus ;
+		return this.deliveryStatus.intValue() ;
 	}
-	
+
+
 	@Override
     public String toString() {
         return "SmsOutboundMessage [externalId=" + externalId + ", internalId=" + internalId

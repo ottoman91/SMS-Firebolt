@@ -18,8 +18,6 @@
  */
 package xyz.idtlabs.smsgateway.sms.domain;
 
-import java.util.Date;
-import java.text.DateFormat; 
 import java.util.ArrayList;
 import java.util.List; 
 
@@ -33,9 +31,11 @@ public class SendRestSMS {
 
     private List<String> to; 
 
-    SendRestSMS(){
+    public SendRestSMS(){
         this.to = new ArrayList<>();
     }
+
+
 
 
   

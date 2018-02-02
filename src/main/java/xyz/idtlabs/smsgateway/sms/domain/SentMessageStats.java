@@ -18,8 +18,6 @@
  */
 package xyz.idtlabs.smsgateway.sms.domain;
 
-import java.util.Date;
-import java.text.DateFormat;
 
 
 

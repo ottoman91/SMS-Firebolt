@@ -19,7 +19,9 @@
 package xyz.idtlabs.smsgateway.sms.api;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Arrays;
 
 import xyz.idtlabs.smsgateway.constants.MessageGatewayConstants; 
 import xyz.idtlabs.smsgateway.exception.PlatformApiDataValidationException;
@@ -27,12 +29,12 @@ import xyz.idtlabs.smsgateway.exception.PlatformApiInvalidParameterException;
 import xyz.idtlabs.smsgateway.sms.data.DeliveryStatusData;
 import xyz.idtlabs.smsgateway.helpers.PlatformApiDataValidationExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.PlatformApiInvalidParameterExceptionMapper;
-import xyz.idtlabs.smsgateway.helpers.PlatformResourceNotFoundExceptionMapper;
 import xyz.idtlabs.smsgateway.helpers.ApiGlobalErrorResponse;
-import xyz.idtlabs.smsgateway.sms.domain.SMSMessage; 
-import xyz.idtlabs.smsgateway.sms.domain.SubmittedMessages;
+import xyz.idtlabs.smsgateway.sms.domain.Message;
 import xyz.idtlabs.smsgateway.sms.domain.SendRestSMS;
-import xyz.idtlabs.smsgateway.sms.service.SMSMessageService; 
+import xyz.idtlabs.smsgateway.sms.service.BatchMessagesService;
+import xyz.idtlabs.smsgateway.sms.service.SMSMessageService;
+import xyz.idtlabs.smsgateway.sms.service.SmsDeliver; 
 import xyz.idtlabs.smsgateway.tenants.service.TenantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,11 +49,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils; 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.annotation.ExceptionMetered;
-import com.codahale.metrics.annotation.Gauge;
 import com.codahale.metrics.annotation.Metered;
-import com.codahale.metrics.annotation.Timed;
 import com.ryantenney.metrics.annotation.Counted;
 
 
@@ -64,14 +63,20 @@ public class SmsApiResource {
 	//This class sends TRANSACTIONAL & PROMOTIONAL SMS
 	private SMSMessageService smsMessageService ;
     private TenantsService tenantService;
+    private BatchMessagesService batchMessagesService;
     private static final Logger logger = LoggerFactory.getLogger(SMSMessageService.class);
 
 	
 	@Autowired
-    public SmsApiResource(final SMSMessageService smsMessageService, final TenantsService tenantService) {
+    public SmsApiResource(final SMSMessageService smsMessageService, final TenantsService tenantService,
+                          final BatchMessagesService batchMessagesService) {
 		this.smsMessageService = smsMessageService ; 
         this.tenantService = tenantService;
-    } 
+        this.batchMessagesService = batchMessagesService;
+    }  
+
+    @Autowired
+    SmsDeliver smsDeliver; 
 
    // -------------------Send Message via HTTP GET Request--------------------------------------------------------
     @Metered(name = "meter.sendsms.http", absolute=true)
@@ -83,13 +88,22 @@ public class SmsApiResource {
                     @RequestParam(value="body",required=true) String body) {
         tenantService.confirmClientCanSendSms(apiKey);  
         smsMessageService.validateMessageAndDestination(to,body); 
-        smsMessageService.sendSMS(apiKey,to,body);
-        SubmittedMessages submittedMessages = new SubmittedMessages();
-        submittedMessages.setTo(to);
-        submittedMessages.setId(apiKey); 
-        submittedMessages.setAccepted();
- 
-        return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
+        Message message = new Message();
+        message.setTo(to);
+        message.setApiMessageId(apiKey);
+        message.setAccepted();  
+        message.setBody(body); 
+        List<String> individualNumbers = Arrays.asList(to.split(","));
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
+        for (String number : individualNumbers) {
+            String smsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+            smsMessageService.saveSMS(apiKey,number,body,batchId,smsCentreNumber);
+            smsDeliver.send(body,number,batchId,apiKey,smsCentreNumber);
+        }
+        return new ResponseEntity<Message>(message,HttpStatus.OK);
     }  
 
   
@@ -108,12 +122,22 @@ public class SmsApiResource {
         String body = smsMessage.getBody();
         tenantService.confirmClientCanSendSms(apiKey);
         smsMessageService.validateMessageAndDestination(numbers,body); 
-        smsMessageService.sendSMS(apiKey,numbers,body);
-        SubmittedMessages submittedMessages = new SubmittedMessages();
-        submittedMessages.setTo(numbers);
-        submittedMessages.setId(apiKey);
-        submittedMessages.setAccepted();
-        return new ResponseEntity<SubmittedMessages>(submittedMessages,HttpStatus.OK);
+        Message message = new Message();
+        message.setTo(numbers);
+        message.setApiMessageId(apiKey);
+        message.setAccepted();
+        message.setBody(body);
+        List<String> individualNumbers = Arrays.asList(numbers.split(","));
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        Long batchId = batchMessagesService.returnBatchId(currentTime);
+        for (String number : individualNumbers) {
+            String smsCentreNumber = smsMessageService.retrieveSmsCentreNumber(number);
+            smsMessageService.saveSMS(apiKey,number,body,batchId,smsCentreNumber);
+            smsDeliver.send(body,number,batchId,apiKey,smsCentreNumber);
+        }
+        return new ResponseEntity<Message>(message,HttpStatus.OK);
     }
 
     // @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})

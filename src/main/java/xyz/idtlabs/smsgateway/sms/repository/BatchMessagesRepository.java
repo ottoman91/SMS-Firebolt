@@ -16,19 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.configuration;
+package xyz.idtlabs.smsgateway.sms.repository;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.hibernate.engine.jdbc.batch.spi.Batch;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+import xyz.idtlabs.smsgateway.sms.domain.BatchMessages;
 
-public class MessageGatewayInitializer extends SpringBootServletInitializer {
+import java.util.Date;
 
-    public MessageGatewayInitializer() {
-        super();
-    }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MessageGatewayConfiguration.class);
-    }
+@Repository
+public interface BatchMessagesRepository extends JpaRepository<BatchMessages,Long>, JpaSpecificationExecutor<BatchMessages> {
+
+    BatchMessages findBySubmittedOnDate(String submittedOnDate);
+
+
 }

@@ -18,32 +18,23 @@
  */
 package xyz.idtlabs.smsgateway.sms.domain;
 
-import java.util.Date;
-import java.text.DateFormat; 
+public class Message {
 
-
-
-
-
-public class SubmittedMessages {
-
-    private String id;  
+    private String apiMessageId;
 
     private boolean accepted;
 
-    private String to;  
+    private String to;   
+
+    private String body;
 
 
-  
-
-    
-
-    public void setId(final String id){
-        this.id = id;
+    public void setApiMessageId(final String apiMessageId){
+        this.apiMessageId = apiMessageId;
     } 
 
-    public String getId(){
-        return id;
+    public String getApiMessageId(){
+        return apiMessageId;
     } 
 
     public void setAccepted(){
@@ -61,10 +52,13 @@ public class SubmittedMessages {
     
     public String getTo() {
         return to ;
+    }  
+
+    public void setBody(final String body) {
+        this.body = body ;
+    }
+    
+    public String getBody() {
+        return body ;
     } 
-
-  
-
-
-   
 }

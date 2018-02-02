@@ -16,19 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package xyz.idtlabs.smsgateway.configuration;
+package xyz.idtlabs.smsgateway.sms.domain;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import java.util.Date;
 
-public class MessageGatewayInitializer extends SpringBootServletInitializer {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-    public MessageGatewayInitializer() {
-        super();
+@Entity
+@Table(name = "m_batch_messages")
+public class BatchMessages extends AbstractPersistableCustom<Long> {
+
+
+    @Column(name = "submitted_on_date", nullable = true)
+    private String submittedOnDate;
+
+    protected BatchMessages() {
+
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MessageGatewayConfiguration.class);
+    public BatchMessages( final String submittedOnDate){
+        this.submittedOnDate = submittedOnDate;
+    }
+
+
+
+    public String getSubmittedOnDate(){
+        return submittedOnDate;
+    }
+
+
+    public void setSubmittedOnDate(String submittedOnDate){
+        this.submittedOnDate = submittedOnDate;
     }
 }
