@@ -39,7 +39,6 @@ import java.util.logging.*;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @PropertySource("classpath:config.properties")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
@@ -76,7 +75,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   
       http.csrf().disable()
         .authorizeRequests()
-        .antMatchers("/").access("hasRole('ADMIN') or hasRole('USER')")
+        .antMatchers("/clients/**").access("hasRole('ADMIN')")
         .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//We don't need sessions to be created.
     }
