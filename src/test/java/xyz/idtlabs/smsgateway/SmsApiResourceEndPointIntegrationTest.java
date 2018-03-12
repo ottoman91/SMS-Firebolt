@@ -171,14 +171,12 @@ public class SmsApiResourceEndPointIntegrationTest {
     @Test
     public void notAuthenticatedToRetrieveAdminRoleEndPointForGetRequest_returns401(){
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.accept(ContentType.JSON).get("clients/1");
+        Response response = RestAssured.given().accept(ContentType.JSON).get("clients/1");
 
         assertEquals("For user without Admin role, 403 status code was not returned on accessing a " +
                         "restricted end point",
-                403,response.statusCode());
+                401,response.statusCode());
 
     }
 

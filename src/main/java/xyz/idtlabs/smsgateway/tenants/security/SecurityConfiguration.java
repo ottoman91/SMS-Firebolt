@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,6 +40,7 @@ import java.util.logging.*;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@PropertySource("classpath:config.properties")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
     private static String REALM="SMS_FIREBOLT_REALM"; 
@@ -49,23 +51,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(inMemoryUserDetailsManager());
-    }  
+    }
 
-    @Value("classpath:users.properties")
-    private Resource users; 
+    @Value("${admin.username}")
+    String admin;
 
+    @Value("${admin.password}")
+    String adminPassword;
+
+    String role = "ROLE_ADMIN";
 
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        Properties properties = new Properties();
-        try{
-            properties.load(users.getInputStream());
-            
-        }catch(IOException e){
-            LOGGER.log(Level.SEVERE,e.toString(),e);
 
-        }
-        return new InMemoryUserDetailsManager(properties);
+        Properties users = new Properties();
+        users.put(admin,adminPassword + "," + role);
+
+        return new InMemoryUserDetailsManager(users);
     }
 
 
