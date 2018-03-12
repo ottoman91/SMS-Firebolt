@@ -1,4 +1,3 @@
 jar {
-    baseName = 'message-gateway'
-    version = '0.0.1'
+    baseName = 'firebolt'
 }

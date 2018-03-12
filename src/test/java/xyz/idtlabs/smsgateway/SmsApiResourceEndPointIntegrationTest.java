@@ -148,21 +148,20 @@ public class SmsApiResourceEndPointIntegrationTest {
     }
 
     @Test
-    public void noAuthenticationForGetRequest_return401(){
+    public void apiCalledWithIncorrectApiKeyForGetRequest_return401(){
 
         Tenant testClient = new Tenant("defaultApiKey1","defaultClient1",
                 "defaultClientDisplayName1");
 
         tenantRepository.save(testClient);
         Tenant retrievedClient = tenantRepository.findByName("defaultClient1");
-        String apiKey = retrievedClient.getApiKey();
-
+        String apiKey = "xxxx";
 
         Response response = RestAssured.given().param("apiKey",apiKey).
                 param("to","+23277775775").param("body","hello").get("messages/http/send");
 
-        assertEquals("For unauthorized user, 401 status code was not returned",
-                HttpStatus.SC_UNAUTHORIZED,response.statusCode());
+        assertEquals("For Get Request called with incorrect API Key, 500 status code was not returned",
+                HttpStatus.SC_INTERNAL_SERVER_ERROR,response.statusCode());
 
 
 
@@ -174,7 +173,7 @@ public class SmsApiResourceEndPointIntegrationTest {
 
         Response response = RestAssured.given().accept(ContentType.JSON).get("clients/1");
 
-        assertEquals("For user without Admin role, 403 status code was not returned on accessing a " +
+        assertEquals("For user without Admin role, 401 status code was not returned on accessing a " +
                         "restricted end point",
                 401,response.statusCode());
 
@@ -190,11 +189,10 @@ public class SmsApiResourceEndPointIntegrationTest {
         Tenant retrievedClient = tenantRepository.findByName("defaultClient2");
         String apiKey = retrievedClient.getApiKey();
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.accept(ContentType.JSON).param("apiKey",apiKey).
+          Response response = RestAssured.given().accept(ContentType.JSON).param("apiKey",apiKey).
                 param("to","").param("body","hello").get("messages/http/send");
+
 
         assertEquals("Phone Number not entered with Api Call, and 400 Bad Request Status not shown",
                 400,response.statusCode());
@@ -210,10 +208,8 @@ public class SmsApiResourceEndPointIntegrationTest {
         Tenant retrievedClient = tenantRepository.findByName("defaultClient3");
         String apiKey = retrievedClient.getApiKey();
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.accept(ContentType.JSON).param("apiKey",apiKey).
+        Response response = RestAssured.given().accept(ContentType.JSON).param("apiKey",apiKey).
                 param("to","+23277775775").param("body","").get("messages/http/send");
 
         assertEquals("Message Body not entered with Api Call, and 400 Bad Request Status not shown",
@@ -236,17 +232,13 @@ public class SmsApiResourceEndPointIntegrationTest {
         numbers.add("+23277775775");
         numbers.add("+23277773773");
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.accept(ContentType.JSON).param("apiKey",apiKey).
+        Response response = RestAssured.given().accept(ContentType.JSON).param("apiKey",apiKey).
                 param("to",numbers).param("body","testMessage").get("messages/http/send");
 
         assertEquals("Message sent with multiple numbers, 200 OK Status not shown",
                 HttpStatus.SC_OK,response.statusCode());
 
-//        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
-//        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277773773&text=testMessage")));
 
     }
 
@@ -264,10 +256,8 @@ public class SmsApiResourceEndPointIntegrationTest {
         numbers1.add("+23277772772");
         numbers1.add("+23277772772");
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.accept(ContentType.JSON).param("apiKey",apiKey).
+        Response response = RestAssured.given().accept(ContentType.JSON).param("apiKey",apiKey).
                 param("to",numbers1).param("body","hello").get("messages/http/send");
 
         assertEquals("Message sent with duplicate numbers, 400 Bad RequestStatus not shown",
@@ -293,10 +283,8 @@ public class SmsApiResourceEndPointIntegrationTest {
         smsMessage.setBody("testMessage");
         smsMessage.setTo(numbers);
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
+        Response response = RestAssured.given().header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
                 contentType("application/json").body(smsMessage).
                 post("messages");
 
@@ -304,7 +292,6 @@ public class SmsApiResourceEndPointIntegrationTest {
         assertEquals("Single Number sent with message in Api Call, and 200 Status not returned",
                 HttpStatus.SC_OK,response.statusCode());
 
-        //verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
 
     }
 
@@ -327,10 +314,8 @@ public class SmsApiResourceEndPointIntegrationTest {
         smsMessage.setTo(numbers);
 
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
+        Response response = RestAssured.given().header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
                 contentType("application/json").body(smsMessage).
                 post("messages");
 
@@ -355,10 +340,8 @@ public class SmsApiResourceEndPointIntegrationTest {
         smsMessage.setTo(numbers);
 
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
+        Response response = RestAssured.given().header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
                 contentType("application/json").body(smsMessage).
                 post("messages");
 
@@ -382,10 +365,8 @@ public class SmsApiResourceEndPointIntegrationTest {
         smsMessage.setBody("sampleText");
         smsMessage.setTo(numbers);
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
+        Response response = RestAssured.given().header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
                 contentType("application/json").body(smsMessage).
                 post("messages");
 
@@ -414,30 +395,26 @@ public class SmsApiResourceEndPointIntegrationTest {
         smsMessage.setTo(numbers);
 
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
-        Response response = basicAuth.header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
+        Response response = RestAssured.given().header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
                 contentType("application/json").body(smsMessage).
                 post("messages");
 
 
         assertEquals("Multiple verified numbers sent with Api Call, and 200 Status not returned",
                 HttpStatus.SC_OK,response.statusCode());
-//        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277775775&text=testMessage")));
-//        verify(getRequestedFor(urlEqualTo("/cgi-bin/sendsms?smsc=1&username=kannel&password=kannel&to=%2B23277773773&text=testMessage")));
 
     }
 
     @Test
-    public void apiCalledWithoutAuthenticationInPostRequest_return200(){
+    public void apiCalledWithIncorrectApiKeyInPostRequest_return200(){
 
         Tenant testClient = new Tenant("defaultApiKey","defaultClient",
                 "defaultClientDisplayName");
 
         tenantRepository.save(testClient);
         Tenant retrievedClient = tenantRepository.findByName("defaultClient");
-        String apiKey = retrievedClient.getApiKey();
+        String apiKey = "xxxx";
         List<String> numbers = Arrays.asList("+23277775775");
 
         SendRestSMS smsMessage = new SendRestSMS();
@@ -445,8 +422,6 @@ public class SmsApiResourceEndPointIntegrationTest {
         smsMessage.setBody("sampleText");
         smsMessage.setTo(numbers);
 
-        RequestSpecification basicAuth = RestAssured.given().auth().preemptive().
-                basic("idtlabsuser","idtlabs");
 
         Response response = RestAssured.given().
                 header(MessageGatewayConstants.TENANT_APPKEY_HEADER,apiKey).
@@ -454,7 +429,7 @@ public class SmsApiResourceEndPointIntegrationTest {
                 post("messages");
 
 
-        assertEquals("Api Called Without Authentication, and 401 Status not returned",
-                HttpStatus.SC_UNAUTHORIZED,response.statusCode());
+        assertEquals("Api Called With Incorrect ApiKey, and 500 Status not returned",
+                HttpStatus.SC_INTERNAL_SERVER_ERROR,response.statusCode());
     }
 }
