@@ -14,12 +14,13 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQL5Dialect
 
   datasource:
-    url: jdbc:mysql:thin://localhost:3306/messagegateway
+    url: jdbc:mysql://localhost:3306/firebolt
     username: root
     password: mysql
-    driver-class-name: org.drizzle.jdbc.DrizzleDriver
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 # Status Callback configuration for Twilio. Port will be taken from server configuration
 hostconfig:
