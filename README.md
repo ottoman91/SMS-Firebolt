@@ -1,18 +1,51 @@
 # Firebolt
-Firebolt is an SMS gateway written in the Spring Boot framework. It was built with the intent of enabling small and medium enterprises(SMEs) and fintech startups in low resource environments to deliver SMS based services for their customers. The gateway was initially created to facilitate SMS communication for [miKashBoks](https://mikashboks.com/), a mobile money based conditional cash transfer scheme for small-holder farmers in Sierra Leone that was piloted with support from the UNDP in Sierra Leone. The framework is open-source and can be redeployed in  any similar low resource environment.  
+Firebolt is an SMS aggregator written in the Spring Boot framework. It was built with the intent of enabling small and medium enterprises(SMEs) and fintech startups in low resource environments to deliver SMS based services for their customers. The aggregator was initially created to facilitate SMS communication for [miKashBoks](https://mikashboks.com/), a mobile money based conditional cash transfer scheme for small-holder farmers in Sierra Leone that was piloted with support from the UNDP in Sierra Leone. The framework is open-source and can be redeployed in  any similar low resource environment. The aggregator was based off the code-base of the Message Gateway of the [Fineract Project](https://github.com/openMF/message-gateway).
 
 ## Requirements
 1. Java JDK or JRE version 7 or higher
 2. MySQL 
 3. The Gradle Build Tool 
+4. A running or configured Kannel server ( Note: A Kannel server would be required during deployment, but the APIs can be tested out without a running Kannel instance on a local machine)
 
-## Usage
+## Usage and Configuration
 1. Clone this repo
-2. In terminal or another CLI, go to the home director of the repo
+2. In terminal or another CLI, go to the home director of the repo 
+3. Open the src/main/resources/config.properties file. Change the following properties according to your configuration (Note: For testing the aggregator on a local instance, you do not need to change these settings):
+* kannel.url - URL for the Kannel instance deployed
+* kannel.port - Port of the deployed Kannel Instance
+* kannel.username - Username of the deployed Kannel instance
+* kannel.password - Password of the deployed Kannel instance
+* country.codes - Write down the country codes according to the countries where the aggregator would be deployed
+* Write down the names of the mobile network carriers, along with an ID that identifies them. For example, the config.properties file by default contains the names of two mobile network operators in Sierra Leone (Africell and Airtel), and also contains codes attached with each of these. Change these settings according to your requirements
+* admin.username - Username of the admin of the aggregator
+* admin.password - Password for admin rights of the aggregator
+* server.port - Port of the server that is running the Firebolt instance 
+4. Open the src/main/resources/sentry.properties file. Enter the dsn of your sentry instance to log crash reports in real-time 
+5. Open the src/main/resources/users.properties file. Enter the names and priviledge levels of the users of Firebolt. 
 3. Run the following command to build the jar
   `./gradlew clean build` 
 4. Run the jar with the following command 
-`java -jar build/libs/firebolt.jar`
-##### To run 
-  cd build/lib
-  
+`java -jar build/libs/firebolt.jar` 
+
+5. After running the jar, use an API development platform such as [Postman](https://www.getpostman.com/) to test out the API endpoints on your server. You can 
+
+## The API Structure 
+Firebolt communicates with a deployed instance of the [Kannel](https://www.kannel.org/) SMS gateway for sending messages. It provides a number of RESTful APIs that provide the following features:
+1. Managing the configuration of the companies using Firebolt to send messages to their customers
+2. Assessing statistics about the messages sent by differen companies, which can then be used to bill these companies
+3. Sending messages to users 
+4. Sanity checks to ensure that the details of the customer(mobile phone number, message length etc.) are correct. 
+
+### The Clients APIs
+These APIs are used to manage the companies that sign up for using Firebolt. 
+
+#### Create new Client with http://host:9191/clients/ 
+```
+method: POST
+Request Body:
+
+{
+	"tenantId" : "Tenant Id",
+	"description" : "Some Description"
+}
+```
