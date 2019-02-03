@@ -40,12 +40,70 @@ Firebolt communicates with a deployed instance of the [Kannel](https://www.kanne
 These APIs are used to manage the companies that sign up for using Firebolt. 
 
 #### Create new Client with http://host:9191/clients/ 
-```
-method: POST
 Request Body:
-
+```
+method: POST 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 {
-	"tenantId" : "Tenant Id",
-	"description" : "Some Description"
+	"name" : "Jack",
+	"displayName" : "Jack"
+}
+``` 
+Response Body:
+```
+{
+    "id": 2,
+    "apiKey": "f4da4c9a-a734-4309-b0e2-d4e8b907fdec",
+    "name": "Jack",
+    "displayName": "Jack",
+    "blocked": false
 }
 ```
+### Retrive a single client with http://host:9191/clients/{id} 
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+``` 
+Response Body:
+```
+{
+    "id": 2,
+    "apiKey": "f4da4c9a-a734-4309-b0e2-d4e8b907fdec",
+    "name": "Jack",
+    "displayName": "Jack",
+    "blocked": false
+}
+``` 
+### Retrieve all clients with http://host:9191/clients?page={}&size={} 
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```  
+### Delete a client with http://host:9191/clients/{id}
+Request Body:
+```
+method: DELETE 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```  
+### Update a Client's Details with http://host:9191/clients{id}
+Request Body:
+```
+method: PUT 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file 
+{
+	"name" : "Jack",
+	"displayName" : "Jack Snow"
+}
+```  
+Response Body: 
+```
+{
+    "id": 2,
+    "apiKey": "f4da4c9a-a734-4309-b0e2-d4e8b907fdec",
+    "name": "Jack",
+    "displayName": "Jack Snow",
+    "blocked": false
+}
+``` 
