@@ -87,7 +87,7 @@ Request Body:
 method: DELETE 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```  
-### Update a Client's Details with http://host:9191/clients{id}
+### Update a Client's Details with http://host:9191/clients/{id}
 Request Body:
 ```
 method: PUT 
@@ -107,3 +107,43 @@ Response Body:
     "blocked": false
 }
 ``` 
+### Update a Client's API Key with http://host:9191/clients/{id}/apikey
+Request Body:
+```
+method: PUT 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file 
+{
+	"apiKey" : "12345678",
+}
+```   
+### Block a Client from Using the ApiKey with http://host:9191/clients/{id}/block
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```   
+### Unlock a client from using the ApiKey with http://host:9191/clients/{id}/unblock 
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```    
+### Retrieve all messages sent by a client with http://host:9191/clients/{id}/messages?page={}&size={} 
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```   
+### Retrieve a single message sent by a client with http://host:9191/clients/{id}/messages/{messageId} 
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```   
+### Retrieve stats of messages sent by a client within specified dates with http://host:9191/clients/{id}/messages/stats?dataFrom={}&dateTo={} 
+The dates should be in the yyyy-MM-dd format  
+Request Body:
+```
+method: GET 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```   
