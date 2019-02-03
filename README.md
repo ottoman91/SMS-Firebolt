@@ -59,7 +59,7 @@ Response Body:
     "blocked": false
 }
 ```
-### Retrive a single client with http://host:9191/clients/{id} 
+#### Retrive a single client with http://host:9191/clients/{id} 
 Request Body:
 ```
 method: GET 
@@ -75,19 +75,19 @@ Response Body:
     "blocked": false
 }
 ``` 
-### Retrieve all clients with http://host:9191/clients?page={}&size={} 
+#### Retrieve all clients with http://host:9191/clients?page={}&size={} 
 Request Body:
 ```
 method: GET 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```  
-### Delete a client with http://host:9191/clients/{id}
+#### Delete a client with http://host:9191/clients/{id}
 Request Body:
 ```
 method: DELETE 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```  
-### Update a Client's Details with http://host:9191/clients/{id}
+#### Update a Client's Details with http://host:9191/clients/{id}
 Request Body:
 ```
 method: PUT 
@@ -107,7 +107,7 @@ Response Body:
     "blocked": false
 }
 ``` 
-### Update a Client's API Key with http://host:9191/clients/{id}/apikey
+#### Update a Client's API Key with http://host:9191/clients/{id}/apikey
 Request Body:
 ```
 method: PUT 
@@ -116,34 +116,52 @@ Basic Auth with username and password corresponding to the admin.username and ad
 	"apiKey" : "12345678",
 }
 ```   
-### Block a Client from Using the ApiKey with http://host:9191/clients/{id}/block
+#### Block a Client from Using the ApiKey with http://host:9191/clients/{id}/block
 Request Body:
 ```
 method: GET 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```   
-### Unlock a client from using the ApiKey with http://host:9191/clients/{id}/unblock 
+#### Unlock a client from using the ApiKey with http://host:9191/clients/{id}/unblock 
 Request Body:
 ```
 method: GET 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```    
-### Retrieve all messages sent by a client with http://host:9191/clients/{id}/messages?page={}&size={} 
+#### Retrieve all messages sent by a client with http://host:9191/clients/{id}/messages?page={}&size={} 
 Request Body:
 ```
 method: GET 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```   
-### Retrieve a single message sent by a client with http://host:9191/clients/{id}/messages/{messageId} 
+#### Retrieve a single message sent by a client with http://host:9191/clients/{id}/messages/{messageId} 
 Request Body:
 ```
 method: GET 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
 ```   
-### Retrieve stats of messages sent by a client within specified dates with http://host:9191/clients/{id}/messages/stats?dataFrom={}&dateTo={} 
+#### Retrieve stats of messages sent by a client within specified dates with http://host:9191/clients/{id}/messages/stats?dataFrom={}&dateTo={} 
 The dates should be in the yyyy-MM-dd format  
 Request Body:
 ```
 method: GET 
 Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+```   
+### The Messages APIs
+These APIs are used by the clients to send messages to their customers. Each client needs to use their APIKey in order to send the message. 
+
+#### Send Message Via HTTP Get Request with http://host:9191/messages/http/send?apiKey={}&to={}&body={} 
+```
+method: GET 
+```    
+### Send Message Via a JSOn Object in a Post Request with http://host:9191/messages 
+Request Body:
+```
+method: POST 
+Basic Auth with username and password corresponding to the admin.username and admin.password values in the src/main/resources/config.propertiles file
+Add a Header to the APICall with the key 'SMS-Firebolt-Api-Key' and the value equal to the value of the customer's APIKey
+{
+	"to":"+23277774775,+23277776774",
+	"body":"whats up"
+}
 ```   
