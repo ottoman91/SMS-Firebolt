@@ -28,7 +28,7 @@ You can read more about miKashBoks and my role in the project [here](http://usma
 4. Run the jar with the following command 
 `java -jar build/libs/firebolt.jar` 
 
-5. After running the jar, use an API development platform such as [Postman](https://www.getpostman.com/) to test out the API endpoints on your server. You can 
+5. After running the jar, use an API development platform such as [Postman](https://www.getpostman.com/) to test out the API endpoints on your server.  
 
 ## The API Structure 
 Firebolt communicates with a deployed instance of the [Kannel](https://www.kannel.org/) SMS gateway for sending messages. It provides a number of RESTful APIs that provide the following features:
