@@ -10,7 +10,7 @@ You can read more about miKashBoks and my role in the project [here](http://usma
 
 ## High Level Architecture of Firebolt 
 The following is an illustration of the high level architecture of Firebolt. 
-![High Level Architecture](https://github.com/ottoman91/SMS-Firebolt/blob/develop/ussd%20interface.png)
+![High Level Architecture](https://github.com/ottoman91/SMS-Firebolt/blob/develop/Firebolt%20Architecture.png)
 ## Usage and Configuration
 1. Clone this repo
 2. In terminal or another CLI, go to the home director of the repo 
