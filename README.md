@@ -8,6 +8,9 @@ You can read more about miKashBoks and my role in the project [here](http://usma
 3. The Gradle Build Tool 
 4. A running or configured Kannel server ( Note: A Kannel server would be required during deployment, but the APIs can be tested out without a running Kannel instance on a local machine)
 
+## High Level Architecture of Firebolt 
+
+
 ## Usage and Configuration
 1. Clone this repo
 2. In terminal or another CLI, go to the home director of the repo 
