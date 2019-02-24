@@ -10,7 +10,13 @@ You can read more about miKashBoks and my role in the project [here](http://usma
 
 ## High Level Architecture of Firebolt 
 The following is an illustration of the high level architecture of Firebolt. 
-![High Level Architecture](https://github.com/ottoman91/SMS-Firebolt/blob/develop/Firebolt%20Architecture.png)
+![High Level Architecture](https://github.com/ottoman91/SMS-Firebolt/blob/develop/Firebolt%20Architecture.png) 
+
+### Tenant Service
+The Tenant Service provides a number of APIs that are used by the administrators of Firebolt to create, edit and delete records of clients using Firebolt. The service can also be used for blocking and unblocking clients from using the Firebolt APIs. Finally, it provides APIs that can be used by the administrators for billing purposes, such as reporting the number of messages sent by a client between specific dates etc. 
+
+## Message Service
+The message service provides APIs that are used by the clients for sending messages to specific numbers. The Message service provides a layer of abstraction that allows for clients to easily send their message requests via the API calls that are then forwarded to the Kannel gateway, which in turn sends the messages to the recipients. 
 ## Usage and Configuration
 1. Clone this repo
 2. In terminal or another CLI, go to the home director of the repo 
